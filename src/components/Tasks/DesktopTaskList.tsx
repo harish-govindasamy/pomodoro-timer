@@ -332,6 +332,12 @@ function TaskItem({
       onClick={onSelect}
     >
       <div className="flex items-start gap-3">
+        {/* Color indicator */}
+        <div
+          className="w-1 h-full min-h-[40px] rounded-full shrink-0"
+          style={{ backgroundColor: task.color || "#3B82F6" }}
+        />
+
         <div className="pt-0.5" onClick={(e) => e.stopPropagation()}>
           <Checkbox
             checked={task.isCompleted}

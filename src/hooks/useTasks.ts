@@ -28,7 +28,11 @@ export function useTasks() {
     loadTasks();
   }, []);
 
-  const addNewTask = (title: string, estimatedPomodoros: number = 1) => {
+  const addNewTask = (
+    title: string,
+    estimatedPomodoros: number = 1,
+    color?: string
+  ) => {
     if (!validateTaskTitle(title)) {
       throw new Error(
         "Task title is required and must be less than 100 characters"
@@ -39,7 +43,7 @@ export function useTasks() {
       throw new Error("Estimated pomodoros must be between 1 and 10");
     }
 
-    addTask(title, estimatedPomodoros);
+    addTask(title, estimatedPomodoros, color);
   };
 
   const updateTask = (taskId: string, updates: Partial<Task>) => {

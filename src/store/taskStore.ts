@@ -1,15 +1,15 @@
-import { create } from 'zustand';
-import { Task } from '@/types';
-import { loadTasks, saveTasks } from '@/utils/storage';
-import { generateId } from '@/utils';
+import { create } from "zustand";
+import { Task } from "@/types";
+import { loadTasks, saveTasks } from "@/utils/storage";
+import { generateId } from "@/utils";
 
 interface TaskStore {
   tasks: Task[];
   selectedTaskId: string | null;
-  
+
   // Actions
   loadTasks: () => void;
-  addTask: (title: string, estimatedPomodoros: number) => void;
+  addTask: (title: string, estimatedPomodoros: number, color?: string) => void;
   deleteTask: (taskId: string) => void;
   editTask: (taskId: string, updates: Partial<Task>) => void;
   toggleTaskCompletion: (taskId: string) => void;
@@ -29,12 +29,12 @@ export const useTaskStore = create<TaskStore>((set, get) => ({
       const tasks = loadTasks();
       set({ tasks });
     } catch (error) {
-      console.error('Failed to load tasks:', error);
+      console.error("Failed to load tasks:", error);
       set({ tasks: [] });
     }
   },
 
-  addTask: (title: string, estimatedPomodoros: number) => {
+  addTask: (title: string, estimatedPomodoros: number, color?: string) => {
     const newTask: Task = {
       id: generateId(),
       title: title.trim(),
@@ -43,8 +43,9 @@ export const useTaskStore = create<TaskStore>((set, get) => ({
       isCompleted: false,
       createdAt: new Date().toISOString(),
       completedAt: null,
+      color: color || "#3B82F6",
     };
-    
+
     const { tasks } = get();
     const updatedTasks = [...tasks, newTask];
     set({ tasks: updatedTasks });
@@ -53,29 +54,29 @@ export const useTaskStore = create<TaskStore>((set, get) => ({
 
   deleteTask: (taskId: string) => {
     const { tasks, selectedTaskId } = get();
-    const updatedTasks = tasks.filter(task => task.id !== taskId);
+    const updatedTasks = tasks.filter((task) => task.id !== taskId);
     const newSelectedTaskId = selectedTaskId === taskId ? null : selectedTaskId;
-    
-    set({ 
+
+    set({
       tasks: updatedTasks,
-      selectedTaskId: newSelectedTaskId
+      selectedTaskId: newSelectedTaskId,
     });
     saveTasks(updatedTasks);
   },
 
   editTask: (taskId: string, updates: Partial<Task>) => {
     const { tasks } = get();
-    const updatedTasks = tasks.map(task =>
+    const updatedTasks = tasks.map((task) =>
       task.id === taskId ? { ...task, ...updates } : task
     );
-    
+
     set({ tasks: updatedTasks });
     saveTasks(updatedTasks);
   },
 
   toggleTaskCompletion: (taskId: string) => {
     const { tasks } = get();
-    const updatedTasks = tasks.map(task => {
+    const updatedTasks = tasks.map((task) => {
       if (task.id === taskId) {
         const isCompleted = !task.isCompleted;
         return {
@@ -86,7 +87,7 @@ export const useTaskStore = create<TaskStore>((set, get) => ({
       }
       return task;
     });
-    
+
     set({ tasks: updatedTasks });
     saveTasks(updatedTasks);
   },
@@ -102,27 +103,27 @@ export const useTaskStore = create<TaskStore>((set, get) => ({
 
   incrementTaskPomodoro: (taskId: string) => {
     const { tasks } = get();
-    const updatedTasks = tasks.map(task =>
+    const updatedTasks = tasks.map((task) =>
       task.id === taskId
         ? { ...task, completedPomodoros: task.completedPomodoros + 1 }
         : task
     );
-    
+
     set({ tasks: updatedTasks });
     saveTasks(updatedTasks);
   },
 
   getSelectedTask: () => {
     const { tasks, selectedTaskId } = get();
-    return tasks.find(task => task.id === selectedTaskId) || null;
+    return tasks.find((task) => task.id === selectedTaskId) || null;
   },
 
   getTaskStats: () => {
     const { tasks } = get();
     const total = tasks.length;
-    const completed = tasks.filter(task => task.isCompleted).length;
+    const completed = tasks.filter((task) => task.isCompleted).length;
     const remaining = total - completed;
-    
+
     return { total, completed, remaining };
   },
 }));

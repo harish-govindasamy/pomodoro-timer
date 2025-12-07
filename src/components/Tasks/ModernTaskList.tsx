@@ -149,6 +149,12 @@ function TaskCard({
           : "bg-card border border-border hover:bg-muted/50"
       } ${task.isCompleted ? "opacity-60" : ""}`}
     >
+      {/* Color indicator */}
+      <div
+        className="w-1 h-10 rounded-full flex-shrink-0"
+        style={{ backgroundColor: task.color || "#3B82F6" }}
+      />
+
       <Checkbox
         checked={task.isCompleted}
         onCheckedChange={() => onToggle()}

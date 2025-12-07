@@ -36,7 +36,9 @@ export function TaskDetails({
   const [estimatedPomodoros, setEstimatedPomodoros] = useState(
     task?.estimatedPomodoros || 4
   );
-  const [selectedColor, setSelectedColor] = useState(PRIORITY_COLORS[0].color);
+  const [selectedColor, setSelectedColor] = useState(
+    task?.color || PRIORITY_COLORS[4].color
+  );
 
   const focusTime = settings.focusTime;
   const breakTime = settings.shortBreakTime;
@@ -45,9 +47,9 @@ export function TaskDetails({
     if (!title.trim()) return;
 
     if (isNew) {
-      addTask(title, estimatedPomodoros);
+      addTask(title, estimatedPomodoros, selectedColor);
     } else if (task) {
-      updateTask(task.id, { title, estimatedPomodoros });
+      updateTask(task.id, { title, estimatedPomodoros, color: selectedColor });
     }
     onClose();
   };

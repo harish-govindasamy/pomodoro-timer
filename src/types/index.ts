@@ -6,6 +6,7 @@ export interface Task {
   isCompleted: boolean;
   createdAt: string;
   completedAt: string | null;
+  color?: string;
 }
 
 export interface Settings {
