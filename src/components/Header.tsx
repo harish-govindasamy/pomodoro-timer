@@ -81,32 +81,30 @@ export function Header() {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className="flex items-center gap-2">
-                <div className="w-8 h-8 bg-red-500 rounded-full flex items-center justify-center">
-                  <Timer className="w-4 h-4 text-white" />
+                <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center">
+                  <Timer className="w-4 h-4 text-primary-foreground" />
                 </div>
-                <h1 className="text-xl font-bold">Pomofocus</h1>
+                <h1 className="text-xl font-bold">Pomodoro Timer</h1>
               </div>
             </div>
 
             <div className="hidden md:flex items-center gap-4">
               <div className="flex items-center gap-2">
                 <Timer className="w-4 h-4 text-muted-foreground" />
-                <Badge variant="outline">{totalPomodoros} pomodoros</Badge>
+                <Badge variant="outline">{totalPomodoros} sessions today</Badge>
               </div>
 
               <div className="flex items-center gap-2">
                 <CheckCircle2 className="w-4 h-4 text-muted-foreground" />
-                <Badge variant="outline">{totalTasksCompleted} tasks</Badge>
+                <Badge variant="outline">{totalTasksCompleted} tasks done</Badge>
               </div>
 
-              {streak > 0 && (
-                <div className="flex items-center gap-2">
-                  <Flame className="w-4 h-4 text-orange-500" />
-                  <Badge variant="outline" className="text-orange-500">
-                    {streak} day streak
-                  </Badge>
-                </div>
-              )}
+              <div className="flex items-center gap-2">
+                <Flame className="w-4 h-4 text-orange-500" />
+                <Badge variant="outline" className={streak > 0 ? "text-orange-500" : ""}>
+                  {totalFocusTime} min focused
+                </Badge>
+              </div>
             </div>
 
             <div className="flex items-center gap-2">
@@ -127,7 +125,7 @@ export function Header() {
           <div className="md:hidden mt-4 flex items-center justify-center gap-4">
             <div className="flex items-center gap-2">
               <Timer className="w-4 h-4 text-muted-foreground" />
-              <Badge variant="outline">{totalPomodoros}</Badge>
+              <Badge variant="outline">{totalPomodoros} sessions</Badge>
             </div>
 
             <div className="flex items-center gap-2">
@@ -135,14 +133,10 @@ export function Header() {
               <Badge variant="outline">{totalTasksCompleted} tasks</Badge>
             </div>
 
-            {streak > 0 && (
-              <div className="flex items-center gap-2">
-                <Flame className="w-4 h-4 text-orange-500" />
-                <Badge variant="outline" className="text-orange-500">
-                  {streak}
-                </Badge>
-              </div>
-            )}
+            <div className="flex items-center gap-2">
+              <Flame className="w-4 h-4 text-orange-500" />
+              <Badge variant="outline">{totalFocusTime}m</Badge>
+            </div>
           </div>
         </div>
       </header>

@@ -194,7 +194,7 @@ export function SettingsPage({ onBack }: SettingsPageProps) {
 
         {/* Footer */}
         <div className="p-4 text-center text-sm text-muted-foreground">
-          <p>© 2025 Harish Govindasamy</p>
+          <p>© 2025 Growth Mindset Academy</p>
           <p className="mt-1">Version 1.0.0</p>
         </div>
       </div>
