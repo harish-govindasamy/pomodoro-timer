@@ -121,6 +121,37 @@ export function EnhancedTimerDisplay({
     setMounted(true);
   }, []);
 
+  // Keyboard shortcuts handler (Desktop only)
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      // Don't trigger if user is typing in an input field
+      if (
+        event.target instanceof HTMLInputElement ||
+        event.target instanceof HTMLTextAreaElement
+      ) {
+        return;
+      }
+
+      if (event.code === "Space") {
+        event.preventDefault();
+        if (isRunning) {
+          pauseTimer();
+        } else {
+          startTimer();
+        }
+      } else if (event.code === "KeyR") {
+        event.preventDefault();
+        resetTimer();
+      } else if (event.code === "KeyS") {
+        event.preventDefault();
+        skipTimer();
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [isRunning, startTimer, pauseTimer, resetTimer, skipTimer]);
+
   const sizeConfig = {
     small: {
       timer: 200,
