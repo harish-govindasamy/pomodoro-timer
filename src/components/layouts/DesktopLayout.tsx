@@ -26,13 +26,11 @@ import {
   Bell,
   Minus,
   Plus,
-  Github,
   Heart,
 } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 export function DesktopLayout() {
-  const [mounted, setMounted] = useState(false);
   const { loadTasks } = useTaskStore();
   const { settings, loadSettings, updateSetting } = useSettingsStore();
   const { loadStats, today } = useStatsStore();
@@ -45,24 +43,10 @@ export function DesktopLayout() {
     loadTasks();
     loadSettings();
     loadStats();
-    setMounted(true);
   }, [loadTasks, loadSettings, loadStats]);
 
-  if (!mounted) {
-    return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="text-center">
-          <div className="w-16 h-16 rounded-full bg-primary/20 flex items-center justify-center mx-auto mb-4 animate-pulse">
-            <Timer className="w-8 h-8 text-primary" />
-          </div>
-          <p className="text-muted-foreground">Loading...</p>
-        </div>
-      </div>
-    );
-  }
-
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20">
+    <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20 flex flex-col">
       {/* Header */}
       <header className="sticky top-0 z-50 bg-background/80 backdrop-blur-lg border-b border-border">
         <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
@@ -123,7 +107,7 @@ export function DesktopLayout() {
       </header>
 
       {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-6 py-8">
+      <main className="max-w-7xl mx-auto px-6 py-6 flex-1">
         <div className="grid grid-cols-12 gap-8">
           {/* Left Panel - Timer */}
           <div className="col-span-12 lg:col-span-5 xl:col-span-4">
@@ -179,11 +163,11 @@ export function DesktopLayout() {
       </main>
 
       {/* Footer */}
-      <footer className="border-t border-border mt-auto">
-        <div className="max-w-7xl mx-auto px-6 py-6">
+      <footer className="border-t border-border">
+        <div className="max-w-7xl mx-auto px-6 py-4">
           <div className="flex flex-col md:flex-row items-center justify-between gap-4">
             <p className="text-sm text-muted-foreground">
-              © 2025 Harish Govindasamy. Built with{" "}
+              © 2025 Growth Mindset Academy. Built with{" "}
               <Heart className="w-3 h-3 inline text-red-500" /> for focused
               minds.
             </p>
@@ -194,12 +178,8 @@ export function DesktopLayout() {
               <a href="#" className="hover:text-foreground transition-colors">
                 Privacy
               </a>
-              <a
-                href="#"
-                className="hover:text-foreground transition-colors flex items-center gap-1"
-              >
-                <Github className="w-4 h-4" />
-                GitHub
+              <a href="#" className="hover:text-foreground transition-colors">
+                Contact
               </a>
             </div>
           </div>

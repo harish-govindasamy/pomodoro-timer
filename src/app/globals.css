@@ -127,3 +127,106 @@
 .safe-area-bottom {
   padding-bottom: env(safe-area-inset-bottom, 0);
 }
+
+/* Water loading animations */
+@keyframes water-wave {
+  0%,
+  100% {
+    transform: translateX(0) rotate(0deg);
+  }
+  50% {
+    transform: translateX(-25%) rotate(5deg);
+  }
+}
+
+@keyframes water-wave-slow {
+  0%,
+  100% {
+    transform: translateX(0) rotate(0deg);
+  }
+  50% {
+    transform: translateX(25%) rotate(-3deg);
+  }
+}
+
+@keyframes water-wave-reverse {
+  0%,
+  100% {
+    transform: translateX(-25%) rotate(-2deg);
+  }
+  50% {
+    transform: translateX(0) rotate(3deg);
+  }
+}
+
+@keyframes water-float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
+@keyframes water-ripple {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1.5);
+    opacity: 0;
+  }
+}
+
+@keyframes water-bubble {
+  0% {
+    transform: translateY(100vh) scale(0);
+    opacity: 0;
+  }
+  10% {
+    opacity: 0.6;
+  }
+  100% {
+    transform: translateY(-20vh) scale(1);
+    opacity: 0;
+  }
+}
+
+@keyframes water-shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+.animate-water-wave {
+  animation: water-wave 3s ease-in-out infinite;
+}
+
+.animate-water-wave-slow {
+  animation: water-wave-slow 4s ease-in-out infinite;
+}
+
+.animate-water-wave-reverse {
+  animation: water-wave-reverse 3.5s ease-in-out infinite;
+}
+
+.animate-water-float {
+  animation: water-float 2s ease-in-out infinite;
+}
+
+.animate-water-ripple {
+  animation: water-ripple 2s ease-out infinite;
+}
+
+.animate-water-bubble {
+  animation: water-bubble 6s ease-in infinite;
+}
+
+.animate-water-shimmer {
+  animation: water-shimmer 3s linear infinite;
+}

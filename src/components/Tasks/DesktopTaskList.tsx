@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Task } from "@/types";
 import { useTasks } from "@/hooks/useTasks";
 import { useTimer } from "@/hooks/useTimer";
@@ -16,6 +16,7 @@ import {
   Circle,
   MoreVertical,
   Pencil,
+  X,
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -23,6 +24,13 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
 
 interface DesktopTaskListProps {
   onTaskSelect?: (task: Task) => void;
@@ -43,6 +51,7 @@ export function DesktopTaskList({
     toggleComplete,
     selectTask,
     getTaskProgress,
+    updateTask,
   } = useTasks();
   const { setSelectedTaskId } = useTimer();
 
@@ -50,6 +59,28 @@ export function DesktopTaskList({
   const [newTaskPomodoros, setNewTaskPomodoros] = useState(1);
   const [isAdding, setIsAdding] = useState(false);
   const [editingTask, setEditingTask] = useState<Task | null>(null);
+  const [editTitle, setEditTitle] = useState("");
+  const [editPomodoros, setEditPomodoros] = useState(1);
+
+  // When editing task changes, update form fields
+  useEffect(() => {
+    if (editingTask) {
+      setEditTitle(editingTask.title);
+      setEditPomodoros(editingTask.estimatedPomodoros);
+    }
+  }, [editingTask]);
+
+  const handleSaveEdit = () => {
+    if (editingTask && editTitle.trim()) {
+      updateTask(editingTask.id, {
+        title: editTitle.trim(),
+        estimatedPomodoros: editPomodoros,
+      });
+      setEditingTask(null);
+      setEditTitle("");
+      setEditPomodoros(1);
+    }
+  };
 
   const handleAddTask = () => {
     if (newTaskTitle.trim()) {
@@ -205,6 +236,67 @@ export function DesktopTaskList({
           </div>
         )}
       </div>
+
+      {/* Edit Task Dialog */}
+      <Dialog
+        open={!!editingTask}
+        onOpenChange={(open) => !open && setEditingTask(null)}
+      >
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Pencil className="w-5 h-5" />
+              Edit Task
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Task Name</label>
+              <Input
+                value={editTitle}
+                onChange={(e) => setEditTitle(e.target.value)}
+                placeholder="What are you working on?"
+                className="text-base"
+                autoFocus
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") handleSaveEdit();
+                  if (e.key === "Escape") setEditingTask(null);
+                }}
+              />
+            </div>
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Estimated Pomodoros</label>
+              <div className="flex items-center gap-2">
+                {[1, 2, 3, 4, 5, 6, 7, 8].map((n) => (
+                  <Button
+                    key={n}
+                    variant={editPomodoros === n ? "default" : "outline"}
+                    size="sm"
+                    className="w-9 h-9 rounded-full p-0"
+                    onClick={() => setEditPomodoros(n)}
+                  >
+                    {n}
+                  </Button>
+                ))}
+              </div>
+            </div>
+            {editingTask && (
+              <div className="text-sm text-muted-foreground">
+                Progress: {editingTask.completedPomodoros} of {editPomodoros}{" "}
+                pomodoros completed
+              </div>
+            )}
+          </div>
+          <DialogFooter className="gap-2 sm:gap-0">
+            <Button variant="outline" onClick={() => setEditingTask(null)}>
+              Cancel
+            </Button>
+            <Button onClick={handleSaveEdit} disabled={!editTitle.trim()}>
+              Save Changes
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

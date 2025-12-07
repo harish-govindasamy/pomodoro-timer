@@ -96,12 +96,17 @@ export function Header() {
 
               <div className="flex items-center gap-2">
                 <CheckCircle2 className="w-4 h-4 text-muted-foreground" />
-                <Badge variant="outline">{totalTasksCompleted} tasks done</Badge>
+                <Badge variant="outline">
+                  {totalTasksCompleted} tasks done
+                </Badge>
               </div>
 
               <div className="flex items-center gap-2">
                 <Flame className="w-4 h-4 text-orange-500" />
-                <Badge variant="outline" className={streak > 0 ? "text-orange-500" : ""}>
+                <Badge
+                  variant="outline"
+                  className={streak > 0 ? "text-orange-500" : ""}
+                >
                   {totalFocusTime} min focused
                 </Badge>
               </div>
