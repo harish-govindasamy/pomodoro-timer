@@ -7,6 +7,12 @@ import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Slider } from "@/components/ui/slider";
 import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import {
   ChevronLeft,
   ChevronRight,
   Minus,
@@ -15,7 +21,164 @@ import {
   Moon,
   Sun,
   Monitor,
+  Github,
+  Send,
+  Shield,
+  Sparkles,
+  Heart,
+  Info,
 } from "lucide-react";
+
+// Modal content components
+function AboutContent() {
+  return (
+    <div className="space-y-5 text-sm leading-relaxed">
+      <div className="flex items-center gap-3">
+        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-primary/70 flex items-center justify-center">
+          <Sparkles className="w-5 h-5 text-primary-foreground" />
+        </div>
+        <div>
+          <h3 className="font-semibold">Growth Mindset Academy</h3>
+          <p className="text-muted-foreground text-xs">Est. 2021</p>
+        </div>
+      </div>
+
+      <p className="text-muted-foreground">
+        We started with a simple mission:
+        <span className="text-foreground font-medium">
+          {" "}
+          to help people break free from procrastination and unlock their true
+          potential.
+        </span>
+      </p>
+
+      <div className="p-3 bg-primary/5 rounded-lg border-l-4 border-primary">
+        <p className="italic text-foreground text-xs">
+          "The secret of getting ahead is getting started."
+        </p>
+        <p className="text-muted-foreground mt-1 text-xs">— Mark Twain</p>
+      </div>
+
+      <p className="text-muted-foreground">
+        Every great achievement starts with a single focused session. You have
+        the power to transform your productivity, one pomodoro at a time. 🚀
+      </p>
+
+      <div className="flex items-center gap-2 pt-2 text-muted-foreground text-xs">
+        <Heart className="w-3 h-3 text-red-500" />
+        <span>Built with love for focused minds</span>
+      </div>
+    </div>
+  );
+}
+
+function PrivacyContent() {
+  return (
+    <div className="space-y-4 text-sm leading-relaxed">
+      <div className="flex items-center gap-3">
+        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-green-500 to-green-600 flex items-center justify-center">
+          <Shield className="w-5 h-5 text-white" />
+        </div>
+        <div>
+          <h3 className="font-semibold">Privacy Policy</h3>
+          <p className="text-muted-foreground text-xs">
+            Your data, your control
+          </p>
+        </div>
+      </div>
+
+      <div className="space-y-3">
+        <div>
+          <h4 className="font-medium text-foreground mb-1">🔒 Data Storage</h4>
+          <p className="text-muted-foreground text-xs">
+            All data is stored{" "}
+            <span className="text-foreground font-medium">
+              locally on your device
+            </span>
+            . We don't collect or transmit personal data.
+          </p>
+        </div>
+
+        <div>
+          <h4 className="font-medium text-foreground mb-1">🚫 No Tracking</h4>
+          <p className="text-muted-foreground text-xs">
+            We don't use cookies, analytics, or tracking. Your data remains
+            private.
+          </p>
+        </div>
+
+        <div>
+          <h4 className="font-medium text-foreground mb-1">🌐 Open Source</h4>
+          <p className="text-muted-foreground text-xs">
+            Review our code on GitHub to verify our privacy practices.
+          </p>
+        </div>
+      </div>
+
+      <div className="p-3 bg-green-500/10 rounded-lg">
+        <p className="text-green-700 dark:text-green-400 font-medium text-xs">
+          ✓ Your privacy is our priority.
+        </p>
+      </div>
+    </div>
+  );
+}
+
+function ContactContent() {
+  return (
+    <div className="space-y-4 text-sm leading-relaxed">
+      <div className="flex items-center gap-3">
+        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center">
+          <Send className="w-5 h-5 text-white" />
+        </div>
+        <div>
+          <h3 className="font-semibold">Get in Touch</h3>
+          <p className="text-muted-foreground text-xs">
+            We'd love to hear from you
+          </p>
+        </div>
+      </div>
+
+      <p className="text-muted-foreground text-xs">
+        Have questions or suggestions? Reach out through the channels below!
+      </p>
+
+      <div className="space-y-2">
+        <a
+          href="https://t.me/G_Harish"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex items-center gap-3 p-3 bg-blue-500/10 rounded-lg hover:bg-blue-500/20 transition-colors"
+        >
+          <div className="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center">
+            <Send className="w-4 h-4 text-white" />
+          </div>
+          <div className="flex-1">
+            <p className="font-medium text-foreground text-sm">Telegram</p>
+            <p className="text-muted-foreground text-xs">@G_Harish</p>
+          </div>
+        </a>
+
+        <a
+          href="https://github.com/harish-govindasamy/pomodoro-timer"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex items-center gap-3 p-3 bg-muted/50 rounded-lg hover:bg-muted transition-colors"
+        >
+          <div className="w-8 h-8 rounded-full bg-foreground flex items-center justify-center">
+            <Github className="w-4 h-4 text-background" />
+          </div>
+          <div className="flex-1">
+            <p className="font-medium text-foreground text-sm">GitHub</p>
+            <p className="text-muted-foreground text-xs">
+              Contribute to the project
+            </p>
+          </div>
+        </a>
+      </div>
+    </div>
+  );
+}
 
 interface SettingsPageProps {
   onBack?: () => void;
@@ -25,6 +188,9 @@ export function SettingsPage({ onBack }: SettingsPageProps) {
   const { settings, updateSetting } = useSettingsStore();
   const { theme, setTheme } = useTheme();
   const [volume, setVolume] = useState(80);
+  const [modalOpen, setModalOpen] = useState<
+    "about" | "privacy" | "contact" | null
+  >(null);
 
   const handleFocusTimeChange = (delta: number) => {
     const newValue = Math.max(5, Math.min(60, settings.focusTime + delta));
@@ -181,23 +347,98 @@ export function SettingsPage({ onBack }: SettingsPageProps) {
             General
           </h2>
           <div className="space-y-1">
-            <Button variant="ghost" className="w-full justify-between h-12">
-              <span>Rate App</span>
+            <Button
+              variant="ghost"
+              className="w-full justify-between h-12"
+              onClick={() => setModalOpen("about")}
+            >
+              <div className="flex items-center gap-3">
+                <Info className="w-4 h-4 text-muted-foreground" />
+                <span>About</span>
+              </div>
               <ChevronRight className="w-4 h-4" />
             </Button>
-            <Button variant="ghost" className="w-full justify-between h-12">
-              <span>Send Feedback</span>
+            <Button
+              variant="ghost"
+              className="w-full justify-between h-12"
+              onClick={() => setModalOpen("privacy")}
+            >
+              <div className="flex items-center gap-3">
+                <Shield className="w-4 h-4 text-muted-foreground" />
+                <span>Privacy Policy</span>
+              </div>
               <ChevronRight className="w-4 h-4" />
             </Button>
+            <Button
+              variant="ghost"
+              className="w-full justify-between h-12"
+              onClick={() => setModalOpen("contact")}
+            >
+              <div className="flex items-center gap-3">
+                <Send className="w-4 h-4 text-muted-foreground" />
+                <span>Contact Us</span>
+              </div>
+              <ChevronRight className="w-4 h-4" />
+            </Button>
+            <a
+              href="https://github.com/harish-govindasamy/pomodoro-timer"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <Button variant="ghost" className="w-full justify-between h-12">
+                <div className="flex items-center gap-3">
+                  <Github className="w-4 h-4 text-muted-foreground" />
+                  <span>Contribute on GitHub</span>
+                </div>
+                <ChevronRight className="w-4 h-4" />
+              </Button>
+            </a>
           </div>
         </div>
 
         {/* Footer */}
         <div className="p-4 text-center text-sm text-muted-foreground">
-          <p>© 2025 Growth Mindset Academy</p>
-          <p className="mt-1">Version 1.0.0</p>
+          <p className="font-medium">© 2025 Growth Mindset Academy</p>
+          <p className="mt-1 text-xs">Version 1.0.0</p>
         </div>
       </div>
+
+      {/* Modals */}
+      <Dialog
+        open={modalOpen === "about"}
+        onOpenChange={(open) => !open && setModalOpen(null)}
+      >
+        <DialogContent className="max-w-sm max-h-[85vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>About Us</DialogTitle>
+          </DialogHeader>
+          <AboutContent />
+        </DialogContent>
+      </Dialog>
+
+      <Dialog
+        open={modalOpen === "privacy"}
+        onOpenChange={(open) => !open && setModalOpen(null)}
+      >
+        <DialogContent className="max-w-sm max-h-[85vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Privacy Policy</DialogTitle>
+          </DialogHeader>
+          <PrivacyContent />
+        </DialogContent>
+      </Dialog>
+
+      <Dialog
+        open={modalOpen === "contact"}
+        onOpenChange={(open) => !open && setModalOpen(null)}
+      >
+        <DialogContent className="max-w-sm max-h-[85vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Contact</DialogTitle>
+          </DialogHeader>
+          <ContactContent />
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
