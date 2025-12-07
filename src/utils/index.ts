@@ -54,7 +54,42 @@ export function playSound(soundType: string): void {
   try {
     if (typeof window === "undefined") return;
 
-    // Use Web Audio API to generate sounds since we may not have mp3 files
+    // Free peaceful notification sounds from the internet
+    const soundUrls: Record<string, string> = {
+      bell: "https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3", // Soft bell
+      chime:
+        "https://assets.mixkit.co/active_storage/sfx/2867/2867-preview.mp3", // Wind chime
+      digital:
+        "https://assets.mixkit.co/active_storage/sfx/2866/2866-preview.mp3", // Digital notification
+      gentle:
+        "https://assets.mixkit.co/active_storage/sfx/2870/2870-preview.mp3", // Gentle reminder
+      alarm:
+        "https://assets.mixkit.co/active_storage/sfx/2868/2868-preview.mp3", // Positive notification
+    };
+
+    const soundUrl = soundUrls[soundType] || soundUrls.bell;
+
+    // Create audio element and play
+    const audio = new Audio(soundUrl);
+    audio.volume = 0.5; // 50% volume for peaceful sound
+    audio.play().catch((error) => {
+      console.warn(
+        "Failed to play audio file, falling back to oscillator:",
+        error
+      );
+      // Fallback to oscillator if audio file fails
+      playOscillatorSound(soundType);
+    });
+  } catch (error) {
+    console.warn("Failed to play sound:", error);
+    // Fallback to oscillator
+    playOscillatorSound(soundType);
+  }
+}
+
+// Fallback oscillator-based sound
+function playOscillatorSound(soundType: string): void {
+  try {
     const audioContext = new (window.AudioContext ||
       (window as unknown as { webkitAudioContext: typeof AudioContext })
         .webkitAudioContext)();
@@ -85,7 +120,7 @@ export function playSound(soundType: string): void {
     oscillator.start(audioContext.currentTime);
     oscillator.stop(audioContext.currentTime + 0.8);
   } catch (error) {
-    console.warn("Failed to play sound:", error);
+    console.warn("Fallback sound also failed:", error);
   }
 }
 

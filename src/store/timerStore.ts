@@ -13,8 +13,11 @@ interface TimerStore extends TimerData {
   tick: () => void;
   completeSession: () => void;
   getDuration: () => number;
+  refreshDuration: () => void; // Refresh timer when settings change
   // Internal
   intervalId: NodeJS.Timeout | null;
+  startedAt: number | null; // Timestamp when timer started
+  pausedTimeRemaining: number | null; // Time remaining when paused
 }
 
 const getInitialDuration = (mode: TimerMode): number => {
@@ -55,30 +58,48 @@ export const useTimerStore = create<TimerStore>((set, get) => ({
   selectedTaskId: null,
   intervalId: null,
   lastCompletedMode: null,
+  startedAt: null,
+  pausedTimeRemaining: null,
 
   // Actions
   startTimer: () => {
-    const { intervalId } = get();
+    const { intervalId, currentTime } = get();
 
     // Clear any existing interval first
     if (intervalId) {
       clearInterval(intervalId);
     }
 
-    // Create a new interval
+    // Record the start timestamp and duration
+    const now = Date.now();
+    const duration = currentTime; // seconds remaining
+
+    // Create a new interval - using timestamp-based calculation
     const newIntervalId = setInterval(() => {
       get().tick();
-    }, 1000);
+    }, 250); // Check more frequently for better accuracy
 
-    set({ isRunning: true, state: "running", intervalId: newIntervalId });
+    set({
+      isRunning: true,
+      state: "running",
+      intervalId: newIntervalId,
+      startedAt: now,
+      pausedTimeRemaining: duration,
+    });
   },
 
   pauseTimer: () => {
-    const { intervalId } = get();
+    const { intervalId, currentTime } = get();
     if (intervalId) {
       clearInterval(intervalId);
     }
-    set({ isRunning: false, state: "paused", intervalId: null });
+    set({
+      isRunning: false,
+      state: "paused",
+      intervalId: null,
+      startedAt: null,
+      pausedTimeRemaining: currentTime, // Save current time for resume
+    });
   },
 
   resetTimer: () => {
@@ -91,6 +112,8 @@ export const useTimerStore = create<TimerStore>((set, get) => ({
       isRunning: false,
       state: "idle",
       intervalId: null,
+      startedAt: null,
+      pausedTimeRemaining: null,
     });
   },
 
@@ -123,6 +146,8 @@ export const useTimerStore = create<TimerStore>((set, get) => ({
       isRunning: false,
       state: "idle",
       intervalId: null,
+      startedAt: null,
+      pausedTimeRemaining: null,
     });
   },
 
@@ -137,6 +162,8 @@ export const useTimerStore = create<TimerStore>((set, get) => ({
       isRunning: false,
       state: "idle",
       intervalId: null,
+      startedAt: null,
+      pausedTimeRemaining: null,
     });
   },
 
@@ -145,10 +172,19 @@ export const useTimerStore = create<TimerStore>((set, get) => ({
   },
 
   tick: () => {
-    const { currentTime, isRunning } = get();
-    if (isRunning && currentTime > 0) {
-      set({ currentTime: currentTime - 1 });
-    } else if (isRunning && currentTime === 0) {
+    const { isRunning, startedAt, pausedTimeRemaining } = get();
+
+    if (!isRunning || !startedAt || pausedTimeRemaining === null) return;
+
+    // Calculate remaining time based on timestamps (more accurate for background)
+    const now = Date.now();
+    const elapsedSeconds = Math.floor((now - startedAt) / 1000);
+    const newTime = Math.max(0, pausedTimeRemaining - elapsedSeconds);
+
+    if (newTime > 0) {
+      set({ currentTime: newTime });
+    } else if (newTime === 0) {
+      set({ currentTime: 0 });
       get().completeSession();
     }
   },
@@ -189,7 +225,17 @@ export const useTimerStore = create<TimerStore>((set, get) => ({
       state: "completed",
       intervalId: null,
       lastCompletedMode: completedMode,
+      startedAt: null,
+      pausedTimeRemaining: null,
     });
+  },
+
+  refreshDuration: () => {
+    const { mode, state, isRunning } = get();
+    // Only update if timer is not running (idle or paused)
+    if (!isRunning && state === "idle") {
+      set({ currentTime: getInitialDuration(mode) });
+    }
   },
 
   getDuration: () => {

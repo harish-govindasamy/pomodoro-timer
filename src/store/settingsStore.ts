@@ -1,10 +1,11 @@
-import { create } from 'zustand';
-import { Settings } from '@/types';
-import { loadSettings, saveSettings } from '@/utils/storage';
+import { create } from "zustand";
+import { Settings } from "@/types";
+import { loadSettings, saveSettings } from "@/utils/storage";
+import { useTimerStore } from "./timerStore";
 
 interface SettingsStore {
   settings: Settings;
-  
+
   // Actions
   loadSettings: () => void;
   updateSetting: <K extends keyof Settings>(key: K, value: Settings[K]) => void;
@@ -20,11 +21,14 @@ const defaultSettings: Settings = {
   autoStartNextSession: false,
   autoStartBreak: false,
   notificationAdvanceTime: 0,
-  alarmSound: 'bell',
+  alarmSound: "bell",
   soundEnabled: true,
   notificationEnabled: true,
-  theme: 'light',
+  theme: "light",
 };
+
+// Timer-related setting keys that should trigger timer refresh
+const timerSettingKeys = ["focusTime", "shortBreakTime", "longBreakTime"];
 
 export const useSettingsStore = create<SettingsStore>((set, get) => ({
   settings: defaultSettings,
@@ -34,7 +38,7 @@ export const useSettingsStore = create<SettingsStore>((set, get) => ({
       const settings = loadSettings();
       set({ settings });
     } catch (error) {
-      console.error('Failed to load settings:', error);
+      console.error("Failed to load settings:", error);
       set({ settings: defaultSettings });
     }
   },
@@ -45,8 +49,12 @@ export const useSettingsStore = create<SettingsStore>((set, get) => ({
     set({ settings: updatedSettings });
     try {
       saveSettings(updatedSettings);
+      // Refresh timer duration if a timer-related setting changed
+      if (timerSettingKeys.includes(key as string)) {
+        useTimerStore.getState().refreshDuration();
+      }
     } catch (error) {
-      console.error('Failed to save settings:', error);
+      console.error("Failed to save settings:", error);
     }
   },
 
@@ -56,8 +64,15 @@ export const useSettingsStore = create<SettingsStore>((set, get) => ({
     set({ settings: updatedSettings });
     try {
       saveSettings(updatedSettings);
+      // Check if any timer-related settings were updated
+      const hasTimerSettingChange = Object.keys(updates).some((key) =>
+        timerSettingKeys.includes(key)
+      );
+      if (hasTimerSettingChange) {
+        useTimerStore.getState().refreshDuration();
+      }
     } catch (error) {
-      console.error('Failed to save settings:', error);
+      console.error("Failed to save settings:", error);
     }
   },
 
@@ -65,8 +80,10 @@ export const useSettingsStore = create<SettingsStore>((set, get) => ({
     set({ settings: defaultSettings });
     try {
       saveSettings(defaultSettings);
+      // Refresh timer with default settings
+      useTimerStore.getState().refreshDuration();
     } catch (error) {
-      console.error('Failed to save default settings:', error);
+      console.error("Failed to save default settings:", error);
     }
   },
 }));
