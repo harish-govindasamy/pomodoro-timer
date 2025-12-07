@@ -272,17 +272,20 @@ export function EnhancedTimerDisplay({
           <div className="text-sm text-muted-foreground mt-2 text-center">
             <div className="font-medium text-primary flex items-center justify-center gap-1">
               <Target className="w-3 h-3" />
-              {selectedTask.completedPomodoros}/{selectedTask.estimatedPomodoros} pomodoros
+              {selectedTask.completedPomodoros}/
+              {selectedTask.estimatedPomodoros} pomodoros
             </div>
             <div className="text-xs mt-1 flex items-center justify-center gap-1">
               <ModeIcon className="w-3 h-3" />
-              {pomodorosCompleted % settings.longBreakAfter} of {settings.longBreakAfter} until long break
+              {pomodorosCompleted % settings.longBreakAfter} of{" "}
+              {settings.longBreakAfter} until long break
             </div>
           </div>
         ) : (
           <div className="text-sm text-muted-foreground mt-2 flex items-center gap-1">
             <ModeIcon className="w-4 h-4" />
-            {pomodorosCompleted % settings.longBreakAfter} of {settings.longBreakAfter} until long break
+            {pomodorosCompleted % settings.longBreakAfter} of{" "}
+            {settings.longBreakAfter} until long break
           </div>
         )}
       </CircularProgress>

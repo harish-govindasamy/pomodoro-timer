@@ -160,7 +160,8 @@ export function CircularTimerDisplay() {
         {selectedTask ? (
           <div className="text-sm text-muted-foreground mt-2 text-center">
             <div className="font-medium text-primary">
-              {selectedTask.completedPomodoros}/{selectedTask.estimatedPomodoros} task pomodoros
+              {selectedTask.completedPomodoros}/
+              {selectedTask.estimatedPomodoros} task pomodoros
             </div>
             <div className="text-xs mt-1">
               {pomodorosCompleted % 4} of 4 until long break
