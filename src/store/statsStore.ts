@@ -130,24 +130,35 @@ export const useStatsStore = create<StatsStore>((set, get) => ({
   getWeeklyStats: () => {
     const { today, history } = get();
     const allStats = [today, ...history];
-    const todayDate = new Date();
-    const weekAgo = new Date(todayDate.getTime() - 7 * 24 * 60 * 60 * 1000);
+    
+    // Get start of this week (Monday)
+    const now = new Date();
+    const dayOfWeek = now.getDay(); // 0 = Sunday, 1 = Monday, etc.
+    const daysFromMonday = dayOfWeek === 0 ? 6 : dayOfWeek - 1; // Sunday = 6 days from Monday
+    const startOfWeek = new Date(now);
+    startOfWeek.setDate(now.getDate() - daysFromMonday);
+    startOfWeek.setHours(0, 0, 0, 0);
 
     return allStats.filter((stat) => {
-      const statDate = new Date(stat.date + "T00:00:00Z");
-      return statDate >= weekAgo;
+      const statDate = new Date(stat.date + "T00:00:00");
+      statDate.setHours(0, 0, 0, 0);
+      return statDate >= startOfWeek;
     });
   },
 
   getMonthlyStats: () => {
     const { today, history } = get();
     const allStats = [today, ...history];
-    const todayDate = new Date();
-    const monthAgo = new Date(todayDate.getTime() - 30 * 24 * 60 * 60 * 1000);
+    
+    // Get start of this month (1st day of current month)
+    const now = new Date();
+    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+    startOfMonth.setHours(0, 0, 0, 0);
 
     return allStats.filter((stat) => {
-      const statDate = new Date(stat.date + "T00:00:00Z");
-      return statDate >= monthAgo;
+      const statDate = new Date(stat.date + "T00:00:00");
+      statDate.setHours(0, 0, 0, 0);
+      return statDate >= startOfMonth;
     });
   },
 }));
