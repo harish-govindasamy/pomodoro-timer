@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { useTaskStore } from "@/store/taskStore";
 import { useStatsStore } from "@/store/statsStore";
+import { useTimerStore } from "@/store/timerStore";
 import { Task, TaskStats } from "@/types";
 import { validateTaskTitle, validatePomodoroCount } from "@/utils";
 
@@ -24,6 +25,11 @@ export function useTasks() {
     incrementTaskCompletion: incrementStatsTaskCompletion,
     decrementTaskCompletion: decrementStatsTaskCompletion,
   } = useStatsStore();
+
+  const {
+    selectedTaskId: timerSelectedTaskId,
+    setSelectedTaskId: setTimerSelectedTaskId,
+  } = useTimerStore();
 
   // Load tasks on mount
   useEffect(() => {
@@ -80,6 +86,12 @@ export function useTasks() {
     // If task was just completed (not uncompleted), increment stats
     if (isBeingCompleted) {
       incrementStatsTaskCompletion();
+      
+      // If this task is selected in the timer, deselect it
+      // Timer continues running but without a linked task
+      if (timerSelectedTaskId === taskId) {
+        setTimerSelectedTaskId(null);
+      }
     }
     // If task was just uncompleted, decrement stats
     if (isBeingUncompleted) {
