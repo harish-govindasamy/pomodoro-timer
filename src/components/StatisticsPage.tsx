@@ -21,9 +21,15 @@ interface StatisticsPageProps {
 type TabType = "daily" | "weekly" | "monthly";
 
 // Simple bar chart component
-function SimpleBarChart({ data, label }: { data: { label: string; value: number }[]; label: string }) {
-  const maxValue = Math.max(...data.map(d => d.value), 1);
-  
+function SimpleBarChart({
+  data,
+  label,
+}: {
+  data: { label: string; value: number }[];
+  label: string;
+}) {
+  const maxValue = Math.max(...data.map((d) => d.value), 1);
+
   return (
     <div className="space-y-2">
       <div className="flex items-end justify-between h-24 gap-1">
@@ -33,8 +39,11 @@ function SimpleBarChart({ data, label }: { data: { label: string; value: number 
               <div
                 className="w-full bg-gradient-to-t from-primary to-primary/70 rounded-t-md transition-all duration-300"
                 style={{
-                  height: `${Math.max((item.value / maxValue) * 100, item.value > 0 ? 10 : 0)}%`,
-                  minHeight: item.value > 0 ? '4px' : '0px',
+                  height: `${Math.max(
+                    (item.value / maxValue) * 100,
+                    item.value > 0 ? 10 : 0
+                  )}%`,
+                  minHeight: item.value > 0 ? "4px" : "0px",
                 }}
               />
             </div>
@@ -60,58 +69,58 @@ export function StatisticsPage({ onBack }: StatisticsPageProps) {
   // Generate chart data based on active tab
   const chartData = useMemo(() => {
     type ChartItem = { label: string; value: number };
-    
+
     if (activeTab === "daily") {
       // Show hourly breakdown (simplified - just show today's total)
       return [
-        { label: "Today", value: today.pomodorosCompleted }
+        { label: "Today", value: today.pomodorosCompleted },
       ] as ChartItem[];
     } else if (activeTab === "weekly") {
       // Show last 7 days
       const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
       const now = new Date();
       const result: ChartItem[] = [];
-      
+
       for (let i = 6; i >= 0; i--) {
         const date = new Date(now);
         date.setDate(now.getDate() - i);
         const dateStr = date.toISOString().split("T")[0];
         const dayName = days[date.getDay()];
-        
+
         let sessions = 0;
         if (dateStr === today.date) {
           sessions = today.pomodorosCompleted;
         } else {
-          const dayStats = history.find(h => h.date === dateStr);
+          const dayStats = history.find((h) => h.date === dateStr);
           sessions = dayStats?.pomodorosCompleted || 0;
         }
-        
+
         result.push({ label: dayName, value: sessions });
       }
-      
+
       return result;
     } else {
       // Monthly - show last 4 weeks
       const now = new Date();
       const result: ChartItem[] = [];
-      
+
       for (let week = 3; week >= 0; week--) {
         let weekTotal = 0;
         for (let day = 0; day < 7; day++) {
           const date = new Date(now);
           date.setDate(now.getDate() - (week * 7 + day));
           const dateStr = date.toISOString().split("T")[0];
-          
+
           if (dateStr === today.date) {
             weekTotal += today.pomodorosCompleted;
           } else {
-            const dayStats = history.find(h => h.date === dateStr);
+            const dayStats = history.find((h) => h.date === dateStr);
             weekTotal += dayStats?.pomodorosCompleted || 0;
           }
         }
         result.push({ label: `W${4 - week}`, value: weekTotal });
       }
-      
+
       return result;
     }
   }, [activeTab, today, history]);
@@ -259,9 +268,15 @@ export function StatisticsPage({ onBack }: StatisticsPageProps) {
         <div className="mb-6">
           <h3 className="font-semibold mb-4">Productivity</h3>
           <div className="p-4 bg-card rounded-2xl border border-border">
-            <SimpleBarChart 
-              data={chartData} 
-              label={activeTab === "daily" ? "Sessions today" : activeTab === "weekly" ? "Sessions per day" : "Sessions per week"} 
+            <SimpleBarChart
+              data={chartData}
+              label={
+                activeTab === "daily"
+                  ? "Sessions today"
+                  : activeTab === "weekly"
+                  ? "Sessions per day"
+                  : "Sessions per week"
+              }
             />
           </div>
         </div>
