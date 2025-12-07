@@ -300,9 +300,7 @@ export function DesktopLayout() {
       <header className="sticky top-0 z-50 bg-background/80 backdrop-blur-lg">
         <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-primary/70 flex items-center justify-center">
-              <Timer className="w-5 h-5 text-primary-foreground" />
-            </div>
+            <img src="/logo.svg" alt="Pomofocus" className="w-10 h-10" />
             <div>
               <h1 className="text-xl font-semibold tracking-tight">
                 Pomofocus

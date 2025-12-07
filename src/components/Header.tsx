@@ -81,10 +81,8 @@ export function Header() {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className="flex items-center gap-2">
-                <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center">
-                  <Timer className="w-4 h-4 text-primary-foreground" />
-                </div>
-                <h1 className="text-xl font-bold">Pomodoro Timer</h1>
+                <img src="/logo.svg" alt="Pomofocus" className="w-8 h-8" />
+                <h1 className="text-xl font-bold">Pomofocus</h1>
               </div>
             </div>
 

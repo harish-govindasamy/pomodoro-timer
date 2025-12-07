@@ -19,15 +19,13 @@ function TimerPage() {
   return (
     <div className="flex flex-col h-full">
       {/* Header */}
-      <header className="flex items-center justify-between px-4 py-4 border-b border-border bg-background/80 backdrop-blur-lg">
+      <header className="flex items-center justify-between px-4 py-4 bg-background/80 backdrop-blur-lg">
         <Button variant="ghost" size="icon" className="invisible">
           <ChevronLeft className="w-5 h-5" />
         </Button>
         <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
-            <Timer className="w-4 h-4 text-primary" />
-          </div>
-          <h1 className="text-lg font-semibold">Focus Timer</h1>
+          <img src="/logo.svg" alt="Pomofocus" className="w-8 h-8" />
+          <h1 className="text-lg font-semibold">Pomofocus</h1>
         </div>
         <Button variant="ghost" size="icon" className="invisible">
           <Settings className="w-5 h-5" />
