@@ -114,7 +114,7 @@ export function CircularTimerDisplay() {
             25:00
           </div>
           <div className="text-sm text-muted-foreground mt-2">
-            0 of 4 sessions
+            0 of 4 until long break
           </div>
         </CircularProgress>
       </div>
@@ -157,9 +157,20 @@ export function CircularTimerDisplay() {
         <div className="text-6xl font-bold text-foreground tabular-nums tracking-tight">
           {displayTime}
         </div>
-        <div className="text-sm text-muted-foreground mt-2">
-          {pomodorosCompleted} of 4 sessions
-        </div>
+        {selectedTask ? (
+          <div className="text-sm text-muted-foreground mt-2 text-center">
+            <div className="font-medium text-primary">
+              {selectedTask.completedPomodoros}/{selectedTask.estimatedPomodoros} task pomodoros
+            </div>
+            <div className="text-xs mt-1">
+              {pomodorosCompleted % 4} of 4 until long break
+            </div>
+          </div>
+        ) : (
+          <div className="text-sm text-muted-foreground mt-2">
+            {pomodorosCompleted % 4} of 4 until long break
+          </div>
+        )}
       </CircularProgress>
 
       {/* Motivational Text */}
