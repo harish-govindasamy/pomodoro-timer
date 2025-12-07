@@ -20,7 +20,7 @@ export function useTasks() {
     getTaskStats,
   } = useTaskStore();
 
-  const { incrementTaskCompletion: incrementStatsTaskCompletion } =
+  const { incrementTaskCompletion: incrementStatsTaskCompletion, decrementTaskCompletion: decrementStatsTaskCompletion } =
     useStatsStore();
 
   // Load tasks on mount
@@ -71,12 +71,17 @@ export function useTasks() {
     // Check if task is currently incomplete (about to be marked complete)
     const task = tasks.find((t) => t.id === taskId);
     const isBeingCompleted = task && !task.isCompleted;
+    const isBeingUncompleted = task && task.isCompleted;
 
     toggleTaskCompletion(taskId);
 
     // If task was just completed (not uncompleted), increment stats
     if (isBeingCompleted) {
       incrementStatsTaskCompletion();
+    }
+    // If task was just uncompleted, decrement stats
+    if (isBeingUncompleted) {
+      decrementStatsTaskCompletion();
     }
   };
 

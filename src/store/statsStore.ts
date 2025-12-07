@@ -17,6 +17,7 @@ interface StatsStore {
   incrementPomodoro: () => void;
   updateFocusTime: (minutes: number) => void;
   incrementTaskCompletion: () => void;
+  decrementTaskCompletion: () => void;
   addDayToHistory: () => void;
   getStatsForDate: (date: string) => DailyStats | null;
   getWeeklyStats: () => DailyStats[];
@@ -91,6 +92,20 @@ export const useStatsStore = create<StatsStore>((set, get) => ({
     }
   },
 
+  decrementTaskCompletion: () => {
+    const { today } = get();
+    const updatedToday = {
+      ...today,
+      tasksCompleted: Math.max(0, today.tasksCompleted - 1), // Don't go below 0
+    };
+    set({ today: updatedToday });
+    try {
+      saveTodayStats(updatedToday);
+    } catch (error) {
+      console.error("Failed to save today stats:", error);
+    }
+  },
+
   addDayToHistory: () => {
     const { today, history } = get();
     const todayString = getTodayDateString();
@@ -130,7 +145,7 @@ export const useStatsStore = create<StatsStore>((set, get) => ({
   getWeeklyStats: () => {
     const { today, history } = get();
     const allStats = [today, ...history];
-    
+
     // Get start of this week (Monday)
     const now = new Date();
     const dayOfWeek = now.getDay(); // 0 = Sunday, 1 = Monday, etc.
@@ -149,7 +164,7 @@ export const useStatsStore = create<StatsStore>((set, get) => ({
   getMonthlyStats: () => {
     const { today, history } = get();
     const allStats = [today, ...history];
-    
+
     // Get start of this month (1st day of current month)
     const now = new Date();
     const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
