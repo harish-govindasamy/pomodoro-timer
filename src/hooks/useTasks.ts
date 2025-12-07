@@ -86,7 +86,7 @@ export function useTasks() {
     // If task was just completed (not uncompleted), increment stats
     if (isBeingCompleted) {
       incrementStatsTaskCompletion();
-      
+
       // If this task is selected in the timer, deselect it
       // Timer continues running but without a linked task
       if (timerSelectedTaskId === taskId) {
