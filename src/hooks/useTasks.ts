@@ -20,8 +20,10 @@ export function useTasks() {
     getTaskStats,
   } = useTaskStore();
 
-  const { incrementTaskCompletion: incrementStatsTaskCompletion, decrementTaskCompletion: decrementStatsTaskCompletion } =
-    useStatsStore();
+  const {
+    incrementTaskCompletion: incrementStatsTaskCompletion,
+    decrementTaskCompletion: decrementStatsTaskCompletion,
+  } = useStatsStore();
 
   // Load tasks on mount
   useEffect(() => {
