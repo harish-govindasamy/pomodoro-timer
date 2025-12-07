@@ -88,8 +88,19 @@ export function loadTodayStats(): DailyStats {
     const stored = localStorage.getItem(STORAGE_KEYS.TODAY);
     const stats = stored ? JSON.parse(stored) : defaultStats;
     
-    // Reset if it's a new day
+    // If it's a new day, save yesterday's stats to history first
     if (stats.date !== defaultStats.date) {
+      // Only add to history if yesterday had activity
+      if (stats.pomodorosCompleted > 0 || stats.tasksCompleted > 0 || stats.totalFocusTimeMinutes > 0) {
+        const history = loadHistory();
+        // Avoid duplicates - check if this date already exists in history
+        const existingIndex = history.findIndex(h => h.date === stats.date);
+        if (existingIndex === -1) {
+          const updatedHistory = [stats, ...history].slice(0, 30); // Keep last 30 days
+          saveHistory(updatedHistory);
+        }
+      }
+      // Now reset to today's empty stats
       saveTodayStats(defaultStats);
       return defaultStats;
     }
