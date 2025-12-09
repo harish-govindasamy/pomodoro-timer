@@ -6,12 +6,14 @@ import { useSettingsStore } from "@/store/settingsStore";
 import { useStatsStore } from "@/store/statsStore";
 import { BottomNav } from "@/components/BottomNav";
 import { EnhancedTimerDisplay } from "@/components/Timer/EnhancedTimerDisplay";
-import { ModernTaskList } from "@/components/Tasks/ModernTaskList";
-import { SettingsPage } from "@/components/SettingsPage";
-import { StatisticsPage } from "@/components/StatisticsPage";
-import { TaskDetails } from "@/components/Tasks/TaskDetails";
 import { Button } from "@/components/ui/button";
 import { Timer, ChevronLeft, Settings } from "lucide-react";
+import {
+  LazyModernTaskList,
+  LazySettingsPage,
+  LazyStatisticsPage,
+  LazyTaskDetails,
+} from "@/components/LazyComponents";
 
 type ActiveTab = "timer" | "tasks" | "stats" | "settings";
 
@@ -78,7 +80,7 @@ export function MobileLayout() {
   if (isCreatingTask) {
     return (
       <div className="min-h-screen bg-background flex flex-col pb-20">
-        <TaskDetails
+        <LazyTaskDetails
           task={null}
           isNew={true}
           onClose={() => setIsCreatingTask(false)}
@@ -92,9 +94,9 @@ export function MobileLayout() {
       {/* Main Content */}
       <main className="flex-1 flex flex-col">
         {activeTab === "timer" && <TimerPage />}
-        {activeTab === "tasks" && <ModernTaskList />}
-        {activeTab === "stats" && <StatisticsPage />}
-        {activeTab === "settings" && <SettingsPage />}
+        {activeTab === "tasks" && <LazyModernTaskList />}
+        {activeTab === "stats" && <LazyStatisticsPage />}
+        {activeTab === "settings" && <LazySettingsPage />}
       </main>
 
       {/* Bottom Navigation */}

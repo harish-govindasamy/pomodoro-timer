@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { DesktopLayout } from "@/components/layouts/DesktopLayout";
 import { MobileLayout } from "@/components/layouts/MobileLayout";
+import { Onboarding } from "@/components/Onboarding";
 import { useTaskStore } from "@/store/taskStore";
 import { useSettingsStore } from "@/store/settingsStore";
 import { useStatsStore } from "@/store/statsStore";
@@ -37,6 +38,9 @@ function AppContent() {
 
   return (
     <>
+      {/* Onboarding for first-time users */}
+      <Onboarding />
+
       {/* Desktop Layout - visible on lg and above */}
       <div className="hidden lg:block min-h-screen">
         <DesktopLayout />

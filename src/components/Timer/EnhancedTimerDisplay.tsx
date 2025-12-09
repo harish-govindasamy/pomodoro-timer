@@ -224,6 +224,27 @@ export function EnhancedTimerDisplay({
   const modeInfo = getModeInfo();
   const ModeIcon = modeInfo.icon;
 
+  // Announce time changes for screen readers (every minute)
+  const announceTimeForScreenReader = useCallback(
+    (time: string) => {
+      if (!mounted) return;
+      const announcement = document.getElementById("timer-announcement");
+      if (announcement) {
+        announcement.textContent = `Timer: ${time}. ${modeInfo.label}. ${
+          isRunning ? "Running" : state === "paused" ? "Paused" : "Ready"
+        }`;
+      }
+    },
+    [modeInfo.label, isRunning, state, mounted],
+  );
+
+  // Announce time every minute for accessibility
+  useEffect(() => {
+    if (mounted && displayTime.endsWith(":00") && isRunning) {
+      announceTimeForScreenReader(displayTime);
+    }
+  }, [displayTime, isRunning, announceTimeForScreenReader, mounted]);
+
   if (!mounted) {
     return (
       <div
@@ -242,26 +263,6 @@ export function EnhancedTimerDisplay({
       </div>
     );
   }
-
-  // Announce time changes for screen readers (every minute)
-  const announceTimeForScreenReader = useCallback(
-    (time: string) => {
-      const announcement = document.getElementById("timer-announcement");
-      if (announcement) {
-        announcement.textContent = `Timer: ${time}. ${modeInfo.label}. ${
-          isRunning ? "Running" : state === "paused" ? "Paused" : "Ready"
-        }`;
-      }
-    },
-    [modeInfo.label, isRunning, state],
-  );
-
-  // Announce time every minute for accessibility
-  useEffect(() => {
-    if (displayTime.endsWith(":00") && isRunning) {
-      announceTimeForScreenReader(displayTime);
-    }
-  }, [displayTime, isRunning, announceTimeForScreenReader]);
 
   return (
     <div

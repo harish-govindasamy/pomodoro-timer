@@ -12,19 +12,39 @@
   "categories": ["productivity", "utilities"],
   "icons": [
     {
-      "src": "/logo.svg",
-      "sizes": "any",
-      "type": "image/svg+xml",
+      "src": "/icon",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/apple-icon",
+      "sizes": "180x180",
+      "type": "image/png",
       "purpose": "any"
     },
     {
       "src": "/logo.svg",
       "sizes": "any",
       "type": "image/svg+xml",
-      "purpose": "maskable"
+      "purpose": "any"
     }
   ],
-  "screenshots": [],
+  "screenshots": [
+    {
+      "src": "/opengraph-image",
+      "sizes": "1200x630",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "Pomofocus Desktop View"
+    }
+  ],
   "shortcuts": [
     {
       "name": "Start Focus Session",
@@ -33,9 +53,9 @@
       "url": "/?mode=focus",
       "icons": [
         {
-          "src": "/logo.svg",
-          "sizes": "any",
-          "type": "image/svg+xml"
+          "src": "/icon",
+          "sizes": "512x512",
+          "type": "image/png"
         }
       ]
     },
@@ -46,9 +66,9 @@
       "url": "/?tab=tasks",
       "icons": [
         {
-          "src": "/logo.svg",
-          "sizes": "any",
-          "type": "image/svg+xml"
+          "src": "/icon",
+          "sizes": "512x512",
+          "type": "image/png"
         }
       ]
     },
@@ -59,9 +79,9 @@
       "url": "/?tab=stats",
       "icons": [
         {
-          "src": "/logo.svg",
-          "sizes": "any",
-          "type": "image/svg+xml"
+          "src": "/icon",
+          "sizes": "512x512",
+          "type": "image/png"
         }
       ]
     }

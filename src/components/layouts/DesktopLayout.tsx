@@ -7,8 +7,10 @@ import { useStatsStore } from "@/store/statsStore";
 import { useTheme } from "next-themes";
 
 import { EnhancedTimerDisplay } from "@/components/Timer/EnhancedTimerDisplay";
-import { DesktopTaskList } from "@/components/Tasks/DesktopTaskList";
-import { EnhancedStats } from "@/components/EnhancedStats";
+import {
+  LazyDesktopTaskList,
+  LazyEnhancedStats,
+} from "@/components/LazyComponents";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
@@ -395,13 +397,13 @@ export function DesktopLayout() {
 
               <TabsContent value="tasks" className="mt-0">
                 <Card className="p-6">
-                  <DesktopTaskList />
+                  <LazyDesktopTaskList />
                 </Card>
               </TabsContent>
 
               <TabsContent value="stats" className="mt-0">
                 <Card className="p-6">
-                  <EnhancedStats />
+                  <LazyEnhancedStats />
                 </Card>
               </TabsContent>
 

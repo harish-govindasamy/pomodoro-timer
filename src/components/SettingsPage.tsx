@@ -27,7 +27,14 @@ import {
   Sparkles,
   Heart,
   Info,
+  HelpCircle,
+  Download,
+  Upload,
+  Trash2,
 } from "lucide-react";
+import { useOnboarding, ONBOARDING_STORAGE_KEY } from "@/components/Onboarding";
+import { exportData, importData, clearAllData } from "@/utils/storage";
+import { useToast } from "@/hooks/use-toast";
 
 // Modal content components
 function AboutContent() {
@@ -191,6 +198,72 @@ export function SettingsPage({ onBack }: SettingsPageProps) {
   const [modalOpen, setModalOpen] = useState<
     "about" | "privacy" | "contact" | null
   >(null);
+  const [showOnboarding, setShowOnboarding] = useState(false);
+  const { toast } = useToast();
+
+  const handleReplayOnboarding = () => {
+    // Remove the onboarding completion flag
+    if (typeof window !== "undefined") {
+      localStorage.removeItem(ONBOARDING_STORAGE_KEY);
+      // Reload to trigger onboarding
+      window.location.reload();
+    }
+  };
+
+  const handleExportData = () => {
+    try {
+      exportData();
+      toast({
+        title: "Data Exported",
+        description: "Your data has been downloaded as a JSON file.",
+      });
+    } catch {
+      toast({
+        title: "Export Failed",
+        description: "Failed to export data. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleImportData = () => {
+    const input = document.createElement("input");
+    input.type = "file";
+    input.accept = ".json";
+    input.onchange = async (e) => {
+      const file = (e.target as HTMLInputElement).files?.[0];
+      if (file) {
+        const success = await importData(file);
+        if (success) {
+          toast({
+            title: "Data Imported",
+            description: "Your data has been imported. Reloading...",
+          });
+          setTimeout(() => window.location.reload(), 1500);
+        } else {
+          toast({
+            title: "Import Failed",
+            description: "Invalid file format. Please use a valid backup file.",
+            variant: "destructive",
+          });
+        }
+      }
+    };
+    input.click();
+  };
+
+  const handleClearData = () => {
+    if (
+      confirm("Are you sure you want to clear all data? This cannot be undone.")
+    ) {
+      clearAllData();
+      toast({
+        title: "Data Cleared",
+        description: "All data has been cleared. Reloading...",
+      });
+      setTimeout(() => window.location.reload(), 1500);
+    }
+  };
 
   const handleFocusTimeChange = (delta: number) => {
     const newValue = Math.max(5, Math.min(60, settings.focusTime + delta));
@@ -341,12 +414,65 @@ export function SettingsPage({ onBack }: SettingsPageProps) {
           </div>
         </div>
 
+        {/* Data Management Section */}
+        <div className="p-4 border-t border-border">
+          <h2 className="text-sm font-medium text-muted-foreground mb-4">
+            Data Management
+          </h2>
+          <div className="space-y-1">
+            <Button
+              variant="ghost"
+              className="w-full justify-between h-12"
+              onClick={handleExportData}
+            >
+              <div className="flex items-center gap-3">
+                <Download className="w-4 h-4 text-muted-foreground" />
+                <span>Export Data</span>
+              </div>
+              <ChevronRight className="w-4 h-4" />
+            </Button>
+            <Button
+              variant="ghost"
+              className="w-full justify-between h-12"
+              onClick={handleImportData}
+            >
+              <div className="flex items-center gap-3">
+                <Upload className="w-4 h-4 text-muted-foreground" />
+                <span>Import Data</span>
+              </div>
+              <ChevronRight className="w-4 h-4" />
+            </Button>
+            <Button
+              variant="ghost"
+              className="w-full justify-between h-12 text-destructive hover:text-destructive"
+              onClick={handleClearData}
+            >
+              <div className="flex items-center gap-3">
+                <Trash2 className="w-4 h-4" />
+                <span>Clear All Data</span>
+              </div>
+              <ChevronRight className="w-4 h-4" />
+            </Button>
+          </div>
+        </div>
+
         {/* General Section */}
         <div className="p-4 border-t border-border">
           <h2 className="text-sm font-medium text-muted-foreground mb-4">
             General
           </h2>
           <div className="space-y-1">
+            <Button
+              variant="ghost"
+              className="w-full justify-between h-12"
+              onClick={handleReplayOnboarding}
+            >
+              <div className="flex items-center gap-3">
+                <HelpCircle className="w-4 h-4 text-muted-foreground" />
+                <span>Replay Tutorial</span>
+              </div>
+              <ChevronRight className="w-4 h-4" />
+            </Button>
             <Button
               variant="ghost"
               className="w-full justify-between h-12"
