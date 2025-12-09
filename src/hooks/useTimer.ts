@@ -1,4 +1,4 @@
-import { useEffect, useCallback } from "react";
+import { useEffect, useCallback, useRef } from "react";
 import { useTimerStore } from "@/store/timerStore";
 import { useTaskStore } from "@/store/taskStore";
 import { useStatsStore } from "@/store/statsStore";
@@ -95,9 +95,20 @@ export function useTimer() {
     settings.focusTime,
   ]);
 
+  // Track if completion has been handled to prevent multiple calls
+  const completionHandledRef = useRef(false);
+
+  // Reset the flag when state changes from completed to something else
+  useEffect(() => {
+    if (state !== "completed") {
+      completionHandledRef.current = false;
+    }
+  }, [state]);
+
   // Handle timer completion
   useEffect(() => {
-    if (state === "completed") {
+    if (state === "completed" && !completionHandledRef.current) {
+      completionHandledRef.current = true;
       handleTimerComplete();
     }
   }, [state, handleTimerComplete]);
