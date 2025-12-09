@@ -4,6 +4,9 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { z } from "zod";
 
+// Type assertion for Prisma client with all models
+const db = prisma as any;
+
 // Validation schemas
 const createRoomSchema = z.object({
   name: z.string().min(1).max(100),
@@ -51,7 +54,7 @@ export async function GET(request: NextRequest) {
 
     // Get specific room by ID
     if (roomId) {
-      const room = await (prisma as any).focusRoom.findUnique({
+      const room = await db.focusRoom.findUnique({
         where: { id: roomId },
         include: {
           owner: {
@@ -86,7 +89,9 @@ export async function GET(request: NextRequest) {
       }
 
       // Check access permissions
-      const isMember = room.members.some((m: { userId: string }) => m.userId === session?.user?.id);
+      const isMember = room.members.some(
+        (m: { userId: string }) => m.userId === session?.user?.id,
+      );
       const isOwner = room.ownerId === session?.user?.id;
 
       if (!room.isPublic && !isMember && !isOwner) {
@@ -104,7 +109,7 @@ export async function GET(request: NextRequest) {
 
     // Get room by invite code
     if (inviteCode) {
-      const room = await (prisma as any).focusRoom.findUnique({
+      const room = await db.focusRoom.findUnique({
         where: { inviteCode },
         include: {
           owner: {
@@ -124,7 +129,7 @@ export async function GET(request: NextRequest) {
       if (!room) {
         return NextResponse.json(
           { error: "Invalid invite code" },
-          { status: 404 }
+          { status: 404 },
         );
       }
 
@@ -152,7 +157,7 @@ export async function GET(request: NextRequest) {
           return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
         }
 
-        rooms = await (prisma as any).focusRoom.findMany({
+        rooms = await db.focusRoom.findMany({
           where: {
             OR: [
               { ownerId: session.user.id },
@@ -179,7 +184,7 @@ export async function GET(request: NextRequest) {
 
       case "public":
         // Public rooms
-        rooms = await (prisma as any).focusRoom.findMany({
+        rooms = await db.focusRoom.findMany({
           where: {
             isPublic: true,
             isActive: true,
@@ -208,7 +213,7 @@ export async function GET(request: NextRequest) {
       default:
         return NextResponse.json(
           { error: "Invalid type parameter" },
-          { status: 400 }
+          { status: 400 },
         );
     }
 
@@ -217,7 +222,7 @@ export async function GET(request: NextRequest) {
     console.error("Failed to fetch focus rooms:", error);
     return NextResponse.json(
       { error: "Failed to fetch focus rooms" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -242,7 +247,7 @@ export async function POST(request: NextRequest) {
         let inviteCode = generateInviteCode();
         let attempts = 0;
         while (attempts < 10) {
-          const existing = await prisma.focusRoom.findUnique({
+          const existing = await db.focusRoom.findUnique({
             where: { inviteCode },
           });
           if (!existing) break;
@@ -251,7 +256,7 @@ export async function POST(request: NextRequest) {
         }
 
         // Create room and add owner as member
-        const room = await prisma.focusRoom.create({
+        const room = await db.focusRoom.create({
           data: {
             ownerId: session.user.id,
             name: validatedData.name,
@@ -299,7 +304,7 @@ export async function POST(request: NextRequest) {
         const validatedData = joinRoomSchema.parse(body);
 
         // Find room by invite code
-        const room = await prisma.focusRoom.findUnique({
+        const room = await db.focusRoom.findUnique({
           where: { inviteCode: validatedData.inviteCode.toUpperCase() },
           include: {
             _count: { select: { members: true } },
@@ -309,19 +314,19 @@ export async function POST(request: NextRequest) {
         if (!room) {
           return NextResponse.json(
             { error: "Invalid invite code" },
-            { status: 404 }
+            { status: 404 },
           );
         }
 
         if (!room.isActive) {
           return NextResponse.json(
             { error: "This room is no longer active" },
-            { status: 400 }
+            { status: 400 },
           );
         }
 
         // Check if already a member
-        const existingMember = await prisma.focusRoomMember.findUnique({
+        const existingMember = await db.focusRoomMember.findUnique({
           where: {
             roomId_userId: {
               roomId: room.id,
@@ -333,7 +338,7 @@ export async function POST(request: NextRequest) {
         if (existingMember) {
           return NextResponse.json(
             { error: "You are already a member of this room" },
-            { status: 400 }
+            { status: 400 },
           );
         }
 
@@ -341,12 +346,12 @@ export async function POST(request: NextRequest) {
         if (room._count.members >= room.maxMembers) {
           return NextResponse.json(
             { error: "This room is full" },
-            { status: 400 }
+            { status: 400 },
           );
         }
 
         // Add member
-        await prisma.focusRoomMember.create({
+        await db.focusRoomMember.create({
           data: {
             roomId: room.id,
             userId: session.user.id,
@@ -355,7 +360,7 @@ export async function POST(request: NextRequest) {
         });
 
         // Get updated room
-        const updatedRoom = await prisma.focusRoom.findUnique({
+        const updatedRoom = await db.focusRoom.findUnique({
           where: { id: room.id },
           include: {
             owner: {
@@ -390,18 +395,18 @@ export async function POST(request: NextRequest) {
         if (!roomId) {
           return NextResponse.json(
             { error: "Room ID is required" },
-            { status: 400 }
+            { status: 400 },
           );
         }
 
-        const room = await prisma.focusRoom.findUnique({
+        const room = await db.focusRoom.findUnique({
           where: { id: roomId },
         });
 
         if (!room) {
           return NextResponse.json(
             { error: "Room not found" },
-            { status: 404 }
+            { status: 404 },
           );
         }
 
@@ -412,12 +417,12 @@ export async function POST(request: NextRequest) {
               error:
                 "Owner cannot leave the room. Transfer ownership or delete the room instead.",
             },
-            { status: 400 }
+            { status: 400 },
           );
         }
 
         // Remove member
-        await prisma.focusRoomMember.delete({
+        await db.focusRoomMember.delete({
           where: {
             roomId_userId: {
               roomId,
@@ -435,23 +440,23 @@ export async function POST(request: NextRequest) {
         if (!roomId || !mode) {
           return NextResponse.json(
             { error: "Room ID and mode are required" },
-            { status: 400 }
+            { status: 400 },
           );
         }
 
-        const room = await prisma.focusRoom.findUnique({
+        const room = await db.focusRoom.findUnique({
           where: { id: roomId },
         });
 
         if (!room) {
           return NextResponse.json(
             { error: "Room not found" },
-            { status: 404 }
+            { status: 404 },
           );
         }
 
         // Only owner or admin can start sessions
-        const member = await prisma.focusRoomMember.findUnique({
+        const member = await db.focusRoomMember.findUnique({
           where: {
             roomId_userId: {
               roomId,
@@ -463,12 +468,12 @@ export async function POST(request: NextRequest) {
         if (!member || (member.role !== "owner" && member.role !== "admin")) {
           return NextResponse.json(
             { error: "Only room owner or admin can start sessions" },
-            { status: 403 }
+            { status: 403 },
           );
         }
 
         // Update room state
-        const updatedRoom = await prisma.focusRoom.update({
+        const updatedRoom = await db.focusRoom.update({
           where: { id: roomId },
           data: {
             currentMode: mode,
@@ -481,22 +486,25 @@ export async function POST(request: NextRequest) {
 
       default:
         return NextResponse.json(
-          { error: "Invalid action. Use 'create', 'join', 'leave', or 'start-session'" },
-          { status: 400 }
+          {
+            error:
+              "Invalid action. Use 'create', 'join', 'leave', or 'start-session'",
+          },
+          { status: 400 },
         );
     }
   } catch (error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
         { error: "Validation failed", details: error.issues },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
     console.error("Failed to process focus room request:", error);
     return NextResponse.json(
       { error: "Failed to process request" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -514,7 +522,7 @@ export async function PATCH(request: NextRequest) {
     const validatedData = updateRoomSchema.parse(body);
 
     // Verify ownership
-    const room = await prisma.focusRoom.findUnique({
+    const room = await db.focusRoom.findUnique({
       where: { id: validatedData.id },
     });
 
@@ -525,13 +533,13 @@ export async function PATCH(request: NextRequest) {
     if (room.ownerId !== session.user.id) {
       return NextResponse.json(
         { error: "Only the owner can update room settings" },
-        { status: 403 }
+        { status: 403 },
       );
     }
 
     // Update room
     const { id, ...updateData } = validatedData;
-    const updatedRoom = await prisma.focusRoom.update({
+    const updatedRoom = await db.focusRoom.update({
       where: { id },
       data: updateData,
       include: {
@@ -563,14 +571,14 @@ export async function PATCH(request: NextRequest) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
         { error: "Validation failed", details: error.issues },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
     console.error("Failed to update focus room:", error);
     return NextResponse.json(
       { error: "Failed to update focus room" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -590,12 +598,12 @@ export async function DELETE(request: NextRequest) {
     if (!roomId) {
       return NextResponse.json(
         { error: "Room ID is required" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
     // Verify ownership
-    const room = await prisma.focusRoom.findUnique({
+    const room = await db.focusRoom.findUnique({
       where: { id: roomId },
     });
 
@@ -606,12 +614,12 @@ export async function DELETE(request: NextRequest) {
     if (room.ownerId !== session.user.id) {
       return NextResponse.json(
         { error: "Only the owner can delete the room" },
-        { status: 403 }
+        { status: 403 },
       );
     }
 
     // Delete room (will cascade delete members)
-    await prisma.focusRoom.delete({
+    await db.focusRoom.delete({
       where: { id: roomId },
     });
 
@@ -620,7 +628,7 @@ export async function DELETE(request: NextRequest) {
     console.error("Failed to delete focus room:", error);
     return NextResponse.json(
       { error: "Failed to delete focus room" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
