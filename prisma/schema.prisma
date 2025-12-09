@@ -1,8 +1,5 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+// Pomofocus - Complete Database Schema
+// Supports all 16 planned features including social, achievements, and analytics
 
 generator client {
   provider = "prisma-client-js"
@@ -13,20 +10,528 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+// ============================================
+// USER & AUTHENTICATION
+// ============================================
+
 model User {
-  id        String   @id @default(cuid())
-  email     String   @unique
-  name      String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id            String    @id @default(cuid())
+  email         String    @unique
+  emailVerified DateTime?
+  name          String?
+  image         String?
+  passwordHash  String?   // For credentials auth
+
+  // Profile
+  username      String?   @unique
+  bio           String?
+  timezone      String    @default("UTC")
+
+  // Timestamps
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  lastActiveAt  DateTime  @default(now())
+
+  // Relations
+  accounts      Account[]
+  sessions      AuthSession[]
+  settings      UserSettings?
+  tasks         Task[]
+  pomodoroSessions PomodoroSession[]
+  dailyStats    DailyStats[]
+  achievements  UserAchievement[]
+  streak        Streak?
+  goals         DailyGoal[]
+  notes         TaskNote[]
+  categories    Category[]
+
+  // Social relations
+  focusRoomMemberships FocusRoomMember[]
+  ownedFocusRooms      FocusRoom[]
+  friendshipsInitiated Friendship[] @relation("FriendshipInitiator")
+  friendshipsReceived  Friendship[] @relation("FriendshipReceiver")
+
+  // Indexes for performance
+  @@index([email])
+  @@index([username])
+  @@index([lastActiveAt])
 }
 
-model Post {
+// NextAuth Account (for OAuth providers)
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@index([userId])
+}
+
+// NextAuth Session
+model AuthSession {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+// NextAuth Verification Token
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+// ============================================
+// USER SETTINGS
+// ============================================
+
+model UserSettings {
+  id                    String  @id @default(cuid())
+  userId                String  @unique
+
+  // Timer settings
+  focusTime             Int     @default(25)      // minutes
+  shortBreakTime        Int     @default(5)       // minutes
+  longBreakTime         Int     @default(15)      // minutes
+  longBreakAfter        Int     @default(4)       // pomodoros
+
+  // Automation
+  autoStartNextSession  Boolean @default(false)
+  autoStartBreak        Boolean @default(false)
+
+  // Notifications
+  soundEnabled          Boolean @default(true)
+  notificationEnabled   Boolean @default(true)
+  notificationAdvanceTime Int   @default(0)       // seconds before end
+  alarmSound            String  @default("bell")
+
+  // Appearance
+  theme                 String  @default("system") // light, dark, system
+
+  // Privacy
+  showOnLeaderboard     Boolean @default(true)
+  allowFriendRequests   Boolean @default(true)
+  publicProfile         Boolean @default(false)
+
+  // Weekly report
+  weeklyReportEnabled   Boolean @default(true)
+  weeklyReportDay       Int     @default(1)       // 0=Sunday, 1=Monday, etc.
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+// ============================================
+// TASKS & CATEGORIES
+// ============================================
+
+model Category {
   id        String   @id @default(cuid())
-  title     String
-  content   String?
-  published Boolean  @default(false)
-  authorId  String
+  userId    String
+  name      String
+  color     String   @default("#3B82F6")
+  icon      String?  // Lucide icon name
+  order     Int      @default(0)
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tasks     Task[]
+
+  @@unique([userId, name])
+  @@index([userId])
+}
+
+model Task {
+  id                  String    @id @default(cuid())
+  userId              String
+  categoryId          String?
+
+  title               String
+  description         String?
+  color               String    @default("#3B82F6")
+
+  // Pomodoro tracking
+  estimatedPomodoros  Int       @default(1)
+  completedPomodoros  Int       @default(0)
+
+  // Status
+  isCompleted         Boolean   @default(false)
+  isArchived          Boolean   @default(false)
+  priority            Int       @default(0)       // 0=none, 1=low, 2=medium, 3=high
+
+  // Ordering
+  order               Int       @default(0)
+
+  // Due date (optional)
+  dueDate             DateTime?
+
+  // Timestamps
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
+  completedAt         DateTime?
+
+  // Relations
+  user                User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  category            Category? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  pomodoroSessions    PomodoroSession[]
+  notes               TaskNote[]
+
+  @@index([userId])
+  @@index([userId, isCompleted])
+  @@index([userId, categoryId])
+  @@index([userId, dueDate])
+}
+
+model TaskNote {
+  id        String   @id @default(cuid())
+  taskId    String
+  userId    String
+  content   String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  task      Task     @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([taskId])
+  @@index([userId])
+}
+
+// ============================================
+// POMODORO SESSIONS & STATS
+// ============================================
+
+model PomodoroSession {
+  id            String    @id @default(cuid())
+  userId        String
+  taskId        String?
+  focusRoomId   String?
+
+  // Session type
+  mode          String    @default("focus")  // focus, shortBreak, longBreak
+
+  // Duration tracking
+  plannedDuration Int     // seconds
+  actualDuration  Int     @default(0)        // seconds (actual focus time)
+
+  // Status
+  status        String    @default("completed") // completed, cancelled, interrupted
+
+  // Timestamps
+  startedAt     DateTime
+  endedAt       DateTime?
+
+  // Distraction tracking (optional feature)
+  distractionCount Int    @default(0)
+
+  // Relations
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  task          Task?     @relation(fields: [taskId], references: [id], onDelete: SetNull)
+  focusRoom     FocusRoom? @relation(fields: [focusRoomId], references: [id], onDelete: SetNull)
+
+  @@index([userId])
+  @@index([userId, startedAt])
+  @@index([userId, mode])
+  @@index([taskId])
+  @@index([focusRoomId])
+}
+
+model DailyStats {
+  id                    String   @id @default(cuid())
+  userId                String
+  date                  String   // YYYY-MM-DD format for easy querying
+
+  // Pomodoro stats
+  pomodorosCompleted    Int      @default(0)
+  totalFocusTimeMinutes Int      @default(0)
+
+  // Task stats
+  tasksCompleted        Int      @default(0)
+  tasksCreated          Int      @default(0)
+
+  // Session breakdown
+  focusSessions         Int      @default(0)
+  shortBreaks           Int      @default(0)
+  longBreaks            Int      @default(0)
+
+  // Quality metrics
+  averageSessionLength  Int      @default(0)  // minutes
+  longestStreak         Int      @default(0)  // consecutive pomodoros
+  distractionCount      Int      @default(0)
+
+  // Goal tracking
+  dailyGoalMet          Boolean  @default(false)
+
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+
+  user                  User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, date])
+  @@index([userId])
+  @@index([userId, date])
+  @@index([date])
+}
+
+// ============================================
+// GOALS & STREAKS
+// ============================================
+
+model DailyGoal {
+  id                String   @id @default(cuid())
+  userId            String
+
+  // Goal settings
+  targetPomodoros   Int      @default(8)
+  targetFocusMinutes Int?    // Alternative to pomodoro count
+
+  // Active period
+  isActive          Boolean  @default(true)
+  startDate         String   // YYYY-MM-DD
+  endDate           String?  // YYYY-MM-DD, null = ongoing
+
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([userId, isActive])
+}
+
+model Streak {
+  id              String   @id @default(cuid())
+  userId          String   @unique
+
+  // Current streak
+  currentStreak   Int      @default(0)
+  currentStreakStart String? // YYYY-MM-DD
+
+  // Best streak ever
+  longestStreak   Int      @default(0)
+  longestStreakStart String?
+  longestStreakEnd   String?
+
+  // Last activity
+  lastActiveDate  String?  // YYYY-MM-DD
+
+  updatedAt       DateTime @updatedAt
+
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+// ============================================
+// ACHIEVEMENTS & GAMIFICATION
+// ============================================
+
+model Achievement {
+  id              String   @id @default(cuid())
+
+  // Achievement info
+  code            String   @unique  // e.g., "first_pomodoro", "streak_7", "early_bird"
+  name            String
+  description     String
+  icon            String            // Emoji or icon name
+
+  // Unlock criteria
+  category        String            // pomodoros, streaks, tasks, time, social
+  requirement     Int               // e.g., 10 for "complete 10 pomodoros"
+
+  // Rarity
+  rarity          String   @default("common") // common, rare, epic, legendary
+  points          Int      @default(10)
+
+  // Display
+  isHidden        Boolean  @default(false)  // Hidden until unlocked
+  order           Int      @default(0)
+
+  // Relations
+  userAchievements UserAchievement[]
+}
+
+model UserAchievement {
+  id            String   @id @default(cuid())
+  userId        String
+  achievementId String
+
+  unlockedAt    DateTime @default(now())
+
+  // Progress tracking (for progressive achievements)
+  progress      Int      @default(0)
+  isCompleted   Boolean  @default(true)
+
+  user          User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  achievement   Achievement @relation(fields: [achievementId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, achievementId])
+  @@index([userId])
+  @@index([achievementId])
+}
+
+// ============================================
+// SOCIAL FEATURES
+// ============================================
+
+model Friendship {
+  id          String   @id @default(cuid())
+
+  initiatorId String
+  receiverId  String
+
+  status      String   @default("pending") // pending, accepted, blocked
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  initiator   User     @relation("FriendshipInitiator", fields: [initiatorId], references: [id], onDelete: Cascade)
+  receiver    User     @relation("FriendshipReceiver", fields: [receiverId], references: [id], onDelete: Cascade)
+
+  @@unique([initiatorId, receiverId])
+  @@index([initiatorId])
+  @@index([receiverId])
+  @@index([status])
+}
+
+model FocusRoom {
+  id          String   @id @default(cuid())
+  ownerId     String
+
+  name        String
+  description String?
+
+  // Room settings
+  isPublic    Boolean  @default(false)
+  maxMembers  Int      @default(10)
+  inviteCode  String?  @unique
+
+  // Session settings
+  focusTime   Int      @default(25)
+  breakTime   Int      @default(5)
+
+  // Status
+  isActive    Boolean  @default(true)
+  currentMode String   @default("idle") // idle, focus, break
+  sessionStartedAt DateTime?
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  owner       User     @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  members     FocusRoomMember[]
+  sessions    PomodoroSession[]
+
+  @@index([ownerId])
+  @@index([inviteCode])
+  @@index([isPublic, isActive])
+}
+
+model FocusRoomMember {
+  id          String   @id @default(cuid())
+  roomId      String
+  userId      String
+
+  role        String   @default("member") // owner, admin, member
+
+  // Stats in this room
+  pomodorosCompleted Int @default(0)
+  totalFocusMinutes  Int @default(0)
+
+  joinedAt    DateTime @default(now())
+  lastActiveAt DateTime @default(now())
+
+  room        FocusRoom @relation(fields: [roomId], references: [id], onDelete: Cascade)
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([roomId, userId])
+  @@index([roomId])
+  @@index([userId])
+}
+
+// ============================================
+// LEADERBOARDS (Cached/Computed)
+// ============================================
+
+model LeaderboardEntry {
+  id          String   @id @default(cuid())
+
+  // Leaderboard type
+  type        String   // weekly, monthly, allTime
+  period      String   // e.g., "2024-W01" for weekly, "2024-01" for monthly
+
+  // User info (denormalized for performance)
+  userId      String
+  userName    String?
+  userImage   String?
+
+  // Stats
+  pomodorosCompleted Int @default(0)
+  totalFocusMinutes  Int @default(0)
+  tasksCompleted     Int @default(0)
+  streakDays         Int @default(0)
+
+  // Ranking
+  rank        Int      @default(0)
+  points      Int      @default(0)  // Computed score
+
+  updatedAt   DateTime @updatedAt
+
+  @@unique([type, period, userId])
+  @@index([type, period])
+  @@index([type, period, rank])
+  @@index([userId])
+}
+
+// ============================================
+// MOTIVATIONAL QUOTES
+// ============================================
+
+model Quote {
+  id        String   @id @default(cuid())
+  text      String
+  author    String?
+  category  String   @default("motivation") // motivation, productivity, focus, break
+
+  isActive  Boolean  @default(true)
+
+  createdAt DateTime @default(now())
+
+  @@index([category, isActive])
+}
+
+// ============================================
+// APP ANALYTICS (Optional - for insights)
+// ============================================
+
+model AnalyticsEvent {
+  id        String   @id @default(cuid())
+  userId    String?
+
+  event     String   // e.g., "timer_started", "task_completed"
+  properties String? // JSON string of event properties
+
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([event])
+  @@index([createdAt])
 }

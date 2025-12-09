@@ -260,7 +260,7 @@ export function DesktopLayout() {
   }, [loadTasks, loadSettings, loadStats]);
 
   return (
-    <div className="min-h-screen bg-linear-to-br from-background via-background to-muted/20 flex flex-col">
+    <div className="min-h-screen bg-background flex flex-col">
       {/* Modals */}
       <Dialog
         open={modalOpen === "about"}
@@ -298,63 +298,58 @@ export function DesktopLayout() {
         </DialogContent>
       </Dialog>
 
-      {/* Header - Minimalistic, no borders */}
-      <header className="sticky top-0 z-50 bg-background/80 backdrop-blur-lg">
-        <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <img src="/logo.svg" alt="Pomofocus" className="w-10 h-10" />
-            <div>
-              <h1 className="text-xl font-semibold tracking-tight">
-                Pomofocus
-              </h1>
-              <p className="text-xs text-muted-foreground font-medium">
-                Growth Mindset Academy
-              </p>
-            </div>
+      {/* Header - Clean and minimal */}
+      <header className="sticky top-0 z-50 bg-background/90 backdrop-blur-md border-b border-border/30">
+        <div className="max-w-7xl mx-auto px-6 h-14 flex items-center justify-between">
+          <div className="flex items-center gap-2.5">
+            <img src="/logo.svg" alt="Pomofocus" className="w-8 h-8" />
+            <h1 className="text-lg font-semibold tracking-tight">Pomofocus</h1>
           </div>
 
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-3">
             {/* Quick Stats */}
-            <div className="hidden lg:flex items-center gap-6 text-sm text-muted-foreground">
-              <div className="flex items-center gap-2">
-                <Target className="w-4 h-4 text-orange-500" />
-                <span className="font-medium">
-                  {today.pomodorosCompleted} sessions
+            <div className="hidden lg:flex items-center gap-4 text-sm text-muted-foreground mr-2">
+              <div className="flex items-center gap-1.5">
+                <Target className="w-3.5 h-3.5 text-orange-500" />
+                <span className="font-medium text-foreground">
+                  {today.pomodorosCompleted}
                 </span>
+                <span className="text-xs">sessions</span>
               </div>
-              <div className="flex items-center gap-2">
-                <BarChart3 className="w-4 h-4 text-blue-500" />
-                <span className="font-medium">
-                  {today.totalFocusTimeMinutes}m focused
+              <div className="flex items-center gap-1.5">
+                <BarChart3 className="w-3.5 h-3.5 text-blue-500" />
+                <span className="font-medium text-foreground">
+                  {today.totalFocusTimeMinutes}m
                 </span>
+                <span className="text-xs">focused</span>
               </div>
             </div>
 
             {/* Theme Toggle */}
-            <div className="flex items-center gap-1 p-1 bg-muted/50 rounded-lg">
+            <div className="flex items-center gap-0.5 p-0.5 bg-muted/40 rounded-lg">
               <Button
                 variant={theme === "light" ? "default" : "ghost"}
                 size="icon"
-                className="w-8 h-8"
+                className="w-7 h-7"
                 onClick={() => setTheme("light")}
               >
-                <Sun className="w-4 h-4" />
+                <Sun className="w-3.5 h-3.5" />
               </Button>
               <Button
                 variant={theme === "dark" ? "default" : "ghost"}
                 size="icon"
-                className="w-8 h-8"
+                className="w-7 h-7"
                 onClick={() => setTheme("dark")}
               >
-                <Moon className="w-4 h-4" />
+                <Moon className="w-3.5 h-3.5" />
               </Button>
               <Button
                 variant={theme === "system" ? "default" : "ghost"}
                 size="icon"
-                className="w-8 h-8"
+                className="w-7 h-7"
                 onClick={() => setTheme("system")}
               >
-                <Monitor className="w-4 h-4" />
+                <Monitor className="w-3.5 h-3.5" />
               </Button>
             </div>
           </div>
@@ -362,11 +357,11 @@ export function DesktopLayout() {
       </header>
 
       {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-6 py-6 flex-1">
-        <div className="grid grid-cols-12 gap-8">
+      <main className="max-w-7xl mx-auto px-6 py-4 flex-1">
+        <div className="grid grid-cols-12 gap-6">
           {/* Left Panel - Timer */}
           <div className="col-span-12 lg:col-span-5 xl:col-span-4">
-            <Card className="p-6 sticky top-24">
+            <Card className="p-5 sticky top-20 border-border/40">
               <EnhancedTimerDisplay size="large" showTaskCard={true} />
             </Card>
           </div>
@@ -377,38 +372,44 @@ export function DesktopLayout() {
               value={activePanel}
               onValueChange={(v) => setActivePanel(v as typeof activePanel)}
             >
-              <TabsList className="grid w-full grid-cols-3 mb-6">
-                <TabsTrigger value="tasks" className="flex items-center gap-2">
-                  <Target className="w-4 h-4" />
+              <TabsList className="grid w-full grid-cols-3 mb-4 h-9">
+                <TabsTrigger
+                  value="tasks"
+                  className="flex items-center gap-1.5 text-sm"
+                >
+                  <Target className="w-3.5 h-3.5" />
                   Tasks
                 </TabsTrigger>
-                <TabsTrigger value="stats" className="flex items-center gap-2">
-                  <BarChart3 className="w-4 h-4" />
-                  Statistics
+                <TabsTrigger
+                  value="stats"
+                  className="flex items-center gap-1.5 text-sm"
+                >
+                  <BarChart3 className="w-3.5 h-3.5" />
+                  Stats
                 </TabsTrigger>
                 <TabsTrigger
                   value="settings"
-                  className="flex items-center gap-2"
+                  className="flex items-center gap-1.5 text-sm"
                 >
-                  <Settings className="w-4 h-4" />
+                  <Settings className="w-3.5 h-3.5" />
                   Settings
                 </TabsTrigger>
               </TabsList>
 
               <TabsContent value="tasks" className="mt-0">
-                <Card className="p-6">
+                <Card className="p-5 border-border/40">
                   <LazyDesktopTaskList />
                 </Card>
               </TabsContent>
 
               <TabsContent value="stats" className="mt-0">
-                <Card className="p-6">
+                <Card className="p-5 border-border/40">
                   <LazyEnhancedStats />
                 </Card>
               </TabsContent>
 
               <TabsContent value="settings" className="mt-0">
-                <Card className="p-6">
+                <Card className="p-5 border-border/40">
                   <SettingsPanel />
                 </Card>
               </TabsContent>
@@ -417,14 +418,14 @@ export function DesktopLayout() {
         </div>
       </main>
 
-      {/* Footer - Minimalistic, no borders */}
-      <footer className="mt-auto">
-        <div className="max-w-7xl mx-auto px-6 py-6">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-            <p className="text-sm text-muted-foreground font-medium">
+      {/* Footer - Minimal */}
+      <footer className="mt-auto border-t border-border/20">
+        <div className="max-w-7xl mx-auto px-6 py-4">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-3">
+            <p className="text-xs text-muted-foreground">
               © 2025 Growth Mindset Academy
             </p>
-            <div className="flex items-center gap-6 text-sm font-medium">
+            <div className="flex items-center gap-4 text-xs">
               <button
                 onClick={() => setModalOpen("about")}
                 className="text-muted-foreground hover:text-foreground transition-colors"
@@ -447,10 +448,10 @@ export function DesktopLayout() {
                 href="https://github.com/harish-govindasamy/pomodoro-timer"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center gap-1.5 text-muted-foreground hover:text-foreground transition-colors"
+                className="flex items-center gap-1 text-muted-foreground hover:text-foreground transition-colors"
               >
-                <Github className="w-4 h-4" />
-                Contribute
+                <Github className="w-3.5 h-3.5" />
+                GitHub
               </a>
             </div>
           </div>
