@@ -45,7 +45,7 @@ function AboutContent() {
   return (
     <div className="space-y-6 text-sm leading-relaxed">
       <div className="flex items-center gap-3">
-        <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-primary to-primary/70 flex items-center justify-center">
+        <div className="w-12 h-12 rounded-xl bg-linear-to-br from-primary to-primary/70 flex items-center justify-center">
           <Sparkles className="w-6 h-6 text-primary-foreground" />
         </div>
         <div>
@@ -106,7 +106,7 @@ function PrivacyContent() {
   return (
     <div className="space-y-6 text-sm leading-relaxed">
       <div className="flex items-center gap-3">
-        <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-green-500 to-green-600 flex items-center justify-center">
+        <div className="w-12 h-12 rounded-xl bg-linear-to-br from-green-500 to-green-600 flex items-center justify-center">
           <Shield className="w-6 h-6 text-white" />
         </div>
         <div>
@@ -172,7 +172,7 @@ function ContactContent() {
   return (
     <div className="space-y-6 text-sm leading-relaxed">
       <div className="flex items-center gap-3">
-        <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center">
+        <div className="w-12 h-12 rounded-xl bg-linear-to-br from-blue-500 to-blue-600 flex items-center justify-center">
           <Send className="w-6 h-6 text-white" />
         </div>
         <div>
@@ -258,7 +258,7 @@ export function DesktopLayout() {
   }, [loadTasks, loadSettings, loadStats]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20 flex flex-col">
+    <div className="min-h-screen bg-linear-to-br from-background via-background to-muted/20 flex flex-col">
       {/* Modals */}
       <Dialog
         open={modalOpen === "about"}
@@ -510,7 +510,7 @@ function SettingsPanel() {
                 onClick={() =>
                   updateSetting(
                     "longBreakAfter",
-                    Math.max(2, settings.longBreakAfter - 1)
+                    Math.max(2, settings.longBreakAfter - 1),
                   )
                 }
               >
@@ -526,7 +526,7 @@ function SettingsPanel() {
                 onClick={() =>
                   updateSetting(
                     "longBreakAfter",
-                    Math.min(8, settings.longBreakAfter + 1)
+                    Math.min(8, settings.longBreakAfter + 1),
                   )
                 }
               >
