@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import { useTimer } from "@/hooks/useTimer";
 import { useSettingsStore } from "@/store/settingsStore";
 import { Button } from "@/components/ui/button";
@@ -102,6 +102,7 @@ export function EnhancedTimerDisplay({
 }: EnhancedTimerDisplayProps) {
   const [mounted, setMounted] = useState(false);
   const { settings } = useSettingsStore();
+  const timerRef = useRef<HTMLDivElement>(null);
   const {
     displayTime,
     progress,
@@ -185,7 +186,7 @@ export function EnhancedTimerDisplay({
           remaining: Math.ceil(
             (settings.focusTime * 60 -
               (settings.focusTime * 60 * progress) / 100) /
-              60
+              60,
           ),
         };
       case "shortBreak":
@@ -196,7 +197,7 @@ export function EnhancedTimerDisplay({
           remaining: Math.ceil(
             (settings.shortBreakTime * 60 -
               (settings.shortBreakTime * 60 * progress) / 100) /
-              60
+              60,
           ),
         };
       case "longBreak":
@@ -207,7 +208,7 @@ export function EnhancedTimerDisplay({
           remaining: Math.ceil(
             (settings.longBreakTime * 60 -
               (settings.longBreakTime * 60 * progress) / 100) /
-              60
+              60,
           ),
         };
       default:
@@ -242,12 +243,60 @@ export function EnhancedTimerDisplay({
     );
   }
 
+  // Announce time changes for screen readers (every minute)
+  const announceTimeForScreenReader = useCallback(
+    (time: string) => {
+      const announcement = document.getElementById("timer-announcement");
+      if (announcement) {
+        announcement.textContent = `Timer: ${time}. ${modeInfo.label}. ${
+          isRunning ? "Running" : state === "paused" ? "Paused" : "Ready"
+        }`;
+      }
+    },
+    [modeInfo.label, isRunning, state],
+  );
+
+  // Announce time every minute for accessibility
+  useEffect(() => {
+    if (displayTime.endsWith(":00") && isRunning) {
+      announceTimeForScreenReader(displayTime);
+    }
+  }, [displayTime, isRunning, announceTimeForScreenReader]);
+
   return (
-    <div className={`flex flex-col items-center ${className}`}>
+    <div
+      className={`flex flex-col items-center ${className}`}
+      role="region"
+      aria-label="Pomodoro Timer"
+      ref={timerRef}
+    >
+      {/* Screen reader announcements (visually hidden) */}
+      <div
+        id="timer-announcement"
+        className="sr-only"
+        aria-live="polite"
+        aria-atomic="true"
+      />
+
+      {/* Skip to timer controls link for keyboard users */}
+      <a
+        href="#timer-controls"
+        className="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-50 focus:px-4 focus:py-2 focus:bg-primary focus:text-primary-foreground focus:rounded-md"
+      >
+        Skip to timer controls
+      </a>
+
       {/* Current Task Card */}
       {showTaskCard && selectedTask && (
-        <div className="w-full max-w-sm mb-6 p-4 bg-card rounded-2xl border border-border flex items-center gap-4 shadow-sm">
-          <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
+        <div
+          className="w-full max-w-sm mb-6 p-4 bg-card rounded-2xl border border-border flex items-center gap-4 shadow-sm"
+          role="status"
+          aria-label={`Current task: ${selectedTask.title}. ${selectedTask.completedPomodoros} of ${selectedTask.estimatedPomodoros} pomodoros completed.`}
+        >
+          <div
+            className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center"
+            aria-hidden="true"
+          >
             <Target className="w-5 h-5 text-primary" />
           </div>
           <div className="flex-1 min-w-0">
@@ -274,28 +323,48 @@ export function EnhancedTimerDisplay({
       )}
 
       {/* Mode Selector Tabs */}
-      <div className="flex gap-2 mb-6">
-        {(["focus", "shortBreak", "longBreak"] as const).map((m) => (
-          <Button
-            key={m}
-            variant={mode === m ? "default" : "outline"}
-            size="sm"
-            onClick={() => setMode(m)}
-            disabled={isRunning}
-            className={`rounded-full px-4 ${mode === m ? modeInfo.color : ""}`}
-          >
-            {m === "focus" && <Target className="w-4 h-4 mr-1" />}
-            {m === "shortBreak" && <Coffee className="w-4 h-4 mr-1" />}
-            {m === "longBreak" && <Moon className="w-4 h-4 mr-1" />}
-            {m === "focus" ? "Focus" : m === "shortBreak" ? "Short" : "Long"}
-          </Button>
-        ))}
+      <div
+        className="flex gap-2 mb-6"
+        role="tablist"
+        aria-label="Timer mode selection"
+      >
+        {(["focus", "shortBreak", "longBreak"] as const).map((m) => {
+          const modeLabels = {
+            focus: "Focus Session",
+            shortBreak: "Short Break",
+            longBreak: "Long Break",
+          };
+          return (
+            <Button
+              key={m}
+              variant={mode === m ? "default" : "outline"}
+              size="sm"
+              onClick={() => setMode(m)}
+              disabled={isRunning}
+              className={`rounded-full px-4 ${mode === m ? modeInfo.color : ""}`}
+              role="tab"
+              aria-selected={mode === m}
+              aria-label={modeLabels[m]}
+              aria-disabled={isRunning}
+            >
+              <span aria-hidden="true">
+                {m === "focus" && <Target className="w-4 h-4 mr-1" />}
+                {m === "shortBreak" && <Coffee className="w-4 h-4 mr-1" />}
+                {m === "longBreak" && <Moon className="w-4 h-4 mr-1" />}
+              </span>
+              {m === "focus" ? "Focus" : m === "shortBreak" ? "Short" : "Long"}
+            </Button>
+          );
+        })}
       </div>
 
       {/* Circular Timer */}
       <CircularProgress progress={progress} size={config.timer} mode={mode}>
         <div
           className={`${config.font} font-bold text-foreground tabular-nums tracking-tight`}
+          role="timer"
+          aria-live="off"
+          aria-label={`Time remaining: ${displayTime}`}
         >
           {displayTime}
         </div>
@@ -322,38 +391,47 @@ export function EnhancedTimerDisplay({
       </CircularProgress>
 
       {/* Status Text */}
-      <div className="mt-6 text-center">
+      <div className="mt-6 text-center" role="status" aria-live="polite">
         <p className="text-lg font-medium text-foreground">{modeInfo.label}</p>
         <p className="text-muted-foreground">
           {isRunning
             ? `${Math.max(0, modeInfo.remaining)} minutes remaining`
             : state === "paused"
-            ? "Paused - tap to continue"
-            : "Ready to start"}
+              ? "Paused - tap to continue"
+              : "Ready to start"}
         </p>
       </div>
 
       {/* Timer Controls */}
-      <div className="flex items-center justify-center gap-4 mt-8">
+      <div
+        id="timer-controls"
+        className="flex items-center justify-center gap-4 mt-8"
+        role="group"
+        aria-label="Timer controls"
+      >
         <Button
           onClick={resetTimer}
           variant="outline"
           size="icon"
           className={`${config.controls} rounded-full`}
           disabled={state === "idle" && !isRunning}
+          aria-label="Reset timer"
+          title="Reset timer (R)"
         >
-          <RotateCcw className="w-5 h-5" />
+          <RotateCcw className="w-5 h-5" aria-hidden="true" />
         </Button>
 
         <Button
           onClick={isRunning ? pauseTimer : startTimer}
           size="lg"
           className={`${config.play} rounded-full ${modeInfo.color} text-white shadow-lg transition-transform hover:scale-105`}
+          aria-label={isRunning ? "Pause timer" : "Start timer"}
+          title={isRunning ? "Pause timer (Space)" : "Start timer (Space)"}
         >
           {isRunning ? (
-            <Pause className="w-7 h-7" />
+            <Pause className="w-7 h-7" aria-hidden="true" />
           ) : (
-            <Play className="w-7 h-7 ml-1" />
+            <Play className="w-7 h-7 ml-1" aria-hidden="true" />
           )}
         </Button>
 
@@ -362,16 +440,31 @@ export function EnhancedTimerDisplay({
           variant="outline"
           size="icon"
           className={`${config.controls} rounded-full`}
+          aria-label="Skip to next session"
+          title="Skip to next session (S)"
         >
-          <SkipForward className="w-5 h-5" />
+          <SkipForward className="w-5 h-5" aria-hidden="true" />
         </Button>
       </div>
 
       {/* Keyboard Shortcuts Hint (Desktop) */}
-      <div className="hidden md:flex gap-4 mt-6 text-xs text-muted-foreground">
-        <span>Space: Play/Pause</span>
-        <span>R: Reset</span>
-        <span>S: Skip</span>
+      <div
+        className="hidden md:flex gap-4 mt-6 text-xs text-muted-foreground"
+        role="note"
+        aria-label="Keyboard shortcuts"
+      >
+        <kbd className="px-2 py-1 bg-muted rounded text-muted-foreground">
+          Space
+        </kbd>
+        <span>Play/Pause</span>
+        <kbd className="px-2 py-1 bg-muted rounded text-muted-foreground">
+          R
+        </kbd>
+        <span>Reset</span>
+        <kbd className="px-2 py-1 bg-muted rounded text-muted-foreground">
+          S
+        </kbd>
+        <span>Skip</span>
       </div>
     </div>
   );

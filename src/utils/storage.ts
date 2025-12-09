@@ -1,11 +1,24 @@
-import { Task, Settings, DailyStats } from "@/types";
+import { Task, Settings, DailyStats, TimerMode } from "@/types";
 
 const STORAGE_KEYS = {
   TASKS: "pomofocus_tasks",
   SETTINGS: "pomofocus_settings",
   TODAY: "pomofocus_today",
   HISTORY: "pomofocus_history",
+  TIMER_STATE: "pomofocus_timer_state",
 } as const;
+
+// Timer state for persistence across page reloads
+export interface PersistedTimerState {
+  mode: TimerMode;
+  pomodorosCompleted: number;
+  selectedTaskId: string | null;
+  // For running timer recovery
+  wasRunning: boolean;
+  startedAt: number | null; // Timestamp when timer was started
+  initialDuration: number; // Duration in seconds when timer started
+  savedAt: number; // Timestamp when state was saved
+}
 
 export function getTodayDateString(): string {
   return new Date().toISOString().split("T")[0];
@@ -192,6 +205,66 @@ export function exportData() {
   } catch (error) {
     console.error("Failed to export data:", error);
   }
+}
+
+// Timer State Persistence Functions
+export function saveTimerState(state: PersistedTimerState): void {
+  try {
+    if (typeof window === "undefined") return;
+    localStorage.setItem(
+      STORAGE_KEYS.TIMER_STATE,
+      JSON.stringify({
+        ...state,
+        savedAt: Date.now(),
+      }),
+    );
+  } catch (error) {
+    console.error("Failed to save timer state:", error);
+  }
+}
+
+export function loadTimerState(): PersistedTimerState | null {
+  try {
+    if (typeof window === "undefined") return null;
+
+    const stored = localStorage.getItem(STORAGE_KEYS.TIMER_STATE);
+    if (!stored) return null;
+
+    const state: PersistedTimerState = JSON.parse(stored);
+
+    // Check if the state is stale (older than 24 hours)
+    const maxAge = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
+    if (Date.now() - state.savedAt > maxAge) {
+      clearTimerState();
+      return null;
+    }
+
+    return state;
+  } catch (error) {
+    console.error("Failed to load timer state:", error);
+    return null;
+  }
+}
+
+export function clearTimerState(): void {
+  try {
+    if (typeof window === "undefined") return;
+    localStorage.removeItem(STORAGE_KEYS.TIMER_STATE);
+  } catch (error) {
+    console.error("Failed to clear timer state:", error);
+  }
+}
+
+// Calculate remaining time for a running timer after page reload
+export function calculateRemainingTime(state: PersistedTimerState): number {
+  if (!state.wasRunning || !state.startedAt) {
+    return state.initialDuration;
+  }
+
+  const elapsed = Math.floor((Date.now() - state.startedAt) / 1000);
+  const remaining = state.initialDuration - elapsed;
+
+  return Math.max(0, remaining);
 }
 
 export function importData(file: File): Promise<boolean> {

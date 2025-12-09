@@ -1,6 +1,12 @@
 import { create } from "zustand";
 import { TimerMode, TimerState, TimerData } from "@/types";
-import { loadSettings } from "@/utils/storage";
+import {
+  loadSettings,
+  saveTimerState,
+  loadTimerState,
+  clearTimerState,
+  calculateRemainingTime,
+} from "@/utils/storage";
 
 interface TimerStore extends TimerData {
   // Actions
@@ -19,6 +25,17 @@ interface TimerStore extends TimerData {
   startedAt: number | null; // Timestamp when timer started
   pausedTimeRemaining: number | null; // Time remaining when paused
 }
+
+// Debounce helper to avoid excessive localStorage writes
+let saveTimeout: NodeJS.Timeout | null = null;
+const debouncedSaveTimerState = (
+  state: Parameters<typeof saveTimerState>[0],
+) => {
+  if (saveTimeout) clearTimeout(saveTimeout);
+  saveTimeout = setTimeout(() => {
+    saveTimerState(state);
+  }, 1000); // Save at most once per second
+};
 
 const getInitialDuration = (mode: TimerMode): number => {
   try {
@@ -48,18 +65,67 @@ const getInitialDuration = (mode: TimerMode): number => {
   }
 };
 
+// Get initial state from localStorage if available
+const getInitialState = () => {
+  const persistedState = loadTimerState();
+
+  if (persistedState) {
+    const remainingTime = calculateRemainingTime(persistedState);
+
+    // If timer was running and there's still time left
+    if (persistedState.wasRunning && remainingTime > 0) {
+      return {
+        currentTime: remainingTime,
+        mode: persistedState.mode,
+        pomodorosCompleted: persistedState.pomodorosCompleted,
+        selectedTaskId: persistedState.selectedTaskId,
+        // Don't auto-resume, but show paused state
+        isRunning: false,
+        state: "paused" as TimerState,
+        startedAt: null,
+        pausedTimeRemaining: remainingTime,
+      };
+    }
+
+    // Timer wasn't running or time expired
+    return {
+      currentTime: getInitialDuration(persistedState.mode),
+      mode: persistedState.mode,
+      pomodorosCompleted: persistedState.pomodorosCompleted,
+      selectedTaskId: persistedState.selectedTaskId,
+      isRunning: false,
+      state: "idle" as TimerState,
+      startedAt: null,
+      pausedTimeRemaining: null,
+    };
+  }
+
+  return {
+    currentTime: getInitialDuration("focus"),
+    mode: "focus" as TimerMode,
+    pomodorosCompleted: 0,
+    selectedTaskId: null,
+    isRunning: false,
+    state: "idle" as TimerState,
+    startedAt: null,
+    pausedTimeRemaining: null,
+  };
+};
+
+const initialState = getInitialState();
+
 export const useTimerStore = create<TimerStore>((set, get) => ({
-  // Initial state
-  currentTime: getInitialDuration("focus"),
-  isRunning: false,
-  mode: "focus",
-  state: "idle",
-  pomodorosCompleted: 0,
-  selectedTaskId: null,
+  // Initial state (recovered from localStorage if available)
+  currentTime: initialState.currentTime,
+  isRunning: initialState.isRunning,
+  mode: initialState.mode,
+  state: initialState.state,
+  pomodorosCompleted: initialState.pomodorosCompleted,
+  selectedTaskId: initialState.selectedTaskId,
   intervalId: null,
   lastCompletedMode: null,
-  startedAt: null,
-  pausedTimeRemaining: null,
+  startedAt: initialState.startedAt,
+  pausedTimeRemaining: initialState.pausedTimeRemaining,
 
   // Actions
   startTimer: () => {
@@ -86,10 +152,28 @@ export const useTimerStore = create<TimerStore>((set, get) => ({
       startedAt: now,
       pausedTimeRemaining: duration,
     });
+
+    // Persist timer state
+    const { mode, pomodorosCompleted, selectedTaskId } = get();
+    saveTimerState({
+      mode,
+      pomodorosCompleted,
+      selectedTaskId,
+      wasRunning: true,
+      startedAt: now,
+      initialDuration: duration,
+      savedAt: Date.now(),
+    });
   },
 
   pauseTimer: () => {
-    const { intervalId, currentTime } = get();
+    const {
+      intervalId,
+      currentTime,
+      mode,
+      pomodorosCompleted,
+      selectedTaskId,
+    } = get();
     if (intervalId) {
       clearInterval(intervalId);
     }
@@ -100,20 +184,43 @@ export const useTimerStore = create<TimerStore>((set, get) => ({
       startedAt: null,
       pausedTimeRemaining: currentTime, // Save current time for resume
     });
+
+    // Persist paused state
+    saveTimerState({
+      mode,
+      pomodorosCompleted,
+      selectedTaskId,
+      wasRunning: false,
+      startedAt: null,
+      initialDuration: currentTime,
+      savedAt: Date.now(),
+    });
   },
 
   resetTimer: () => {
-    const { mode, intervalId } = get();
+    const { mode, intervalId, pomodorosCompleted, selectedTaskId } = get();
     if (intervalId) {
       clearInterval(intervalId);
     }
+    const newDuration = getInitialDuration(mode);
     set({
-      currentTime: getInitialDuration(mode),
+      currentTime: newDuration,
       isRunning: false,
       state: "idle",
       intervalId: null,
       startedAt: null,
       pausedTimeRemaining: null,
+    });
+
+    // Persist reset state
+    saveTimerState({
+      mode,
+      pomodorosCompleted,
+      selectedTaskId,
+      wasRunning: false,
+      startedAt: null,
+      initialDuration: newDuration,
+      savedAt: Date.now(),
     });
   },
 
@@ -140,35 +247,72 @@ export const useTimerStore = create<TimerStore>((set, get) => ({
       nextMode = "focus";
     }
 
+    const newDuration = getInitialDuration(nextMode);
     set({
       mode: nextMode,
-      currentTime: getInitialDuration(nextMode),
+      currentTime: newDuration,
       isRunning: false,
       state: "idle",
       intervalId: null,
       startedAt: null,
       pausedTimeRemaining: null,
     });
+
+    // Persist skipped state
+    saveTimerState({
+      mode: nextMode,
+      pomodorosCompleted,
+      selectedTaskId: get().selectedTaskId,
+      wasRunning: false,
+      startedAt: null,
+      initialDuration: newDuration,
+      savedAt: Date.now(),
+    });
   },
 
   setMode: (mode: TimerMode) => {
-    const { intervalId } = get();
+    const { intervalId, pomodorosCompleted, selectedTaskId } = get();
     if (intervalId) {
       clearInterval(intervalId);
     }
+    const newDuration = getInitialDuration(mode);
     set({
       mode,
-      currentTime: getInitialDuration(mode),
+      currentTime: newDuration,
       isRunning: false,
       state: "idle",
       intervalId: null,
       startedAt: null,
       pausedTimeRemaining: null,
+    });
+
+    // Persist mode change
+    saveTimerState({
+      mode,
+      pomodorosCompleted,
+      selectedTaskId,
+      wasRunning: false,
+      startedAt: null,
+      initialDuration: newDuration,
+      savedAt: Date.now(),
     });
   },
 
   setSelectedTaskId: (taskId: string | null) => {
     set({ selectedTaskId: taskId });
+
+    // Persist task selection
+    const { mode, pomodorosCompleted, currentTime, isRunning, startedAt } =
+      get();
+    debouncedSaveTimerState({
+      mode,
+      pomodorosCompleted,
+      selectedTaskId: taskId,
+      wasRunning: isRunning,
+      startedAt,
+      initialDuration: currentTime,
+      savedAt: Date.now(),
+    });
   },
 
   tick: () => {
@@ -217,16 +361,28 @@ export const useTimerStore = create<TimerStore>((set, get) => ({
       nextMode = "focus";
     }
 
+    const newDuration = getInitialDuration(nextMode);
     set({
       pomodorosCompleted: newPomodorosCompleted,
       mode: nextMode,
-      currentTime: getInitialDuration(nextMode),
+      currentTime: newDuration,
       isRunning: false,
       state: "completed",
       intervalId: null,
       lastCompletedMode: completedMode,
       startedAt: null,
       pausedTimeRemaining: null,
+    });
+
+    // Persist completed session state
+    saveTimerState({
+      mode: nextMode,
+      pomodorosCompleted: newPomodorosCompleted,
+      selectedTaskId: get().selectedTaskId,
+      wasRunning: false,
+      startedAt: null,
+      initialDuration: newDuration,
+      savedAt: Date.now(),
     });
   },
 
