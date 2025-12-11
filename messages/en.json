@@ -1,0 +1,89 @@
+{
+  "common": {
+    "start": "Start",
+    "pause": "Pause",
+    "reset": "Reset",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "loading": "Loading...",
+    "error": "An error occurred",
+    "success": "Success!"
+  },
+  "timer": {
+    "focus": "Focus",
+    "shortBreak": "Short Break",
+    "longBreak": "Long Break",
+    "timeRemaining": "{minutes} min remaining",
+    "sessionComplete": "Session Complete!",
+    "pomodorosCompleted": "{count} pomodoros completed"
+  },
+  "tasks": {
+    "title": "Tasks",
+    "addTask": "Add a task",
+    "completed": "Completed",
+    "pending": "Pending",
+    "noTasks": "No tasks yet. Add one to get started!",
+    "deleteConfirm": "Are you sure you want to delete this task?",
+    "estimatedPomodoros": "{count} estimated pomodoros"
+  },
+  "settings": {
+    "title": "Settings",
+    "focusDuration": "Focus Duration",
+    "shortBreakDuration": "Short Break Duration",
+    "longBreakDuration": "Long Break Duration",
+    "autoStartBreaks": "Auto-start Breaks",
+    "autoStartPomodoros": "Auto-start Pomodoros",
+    "notifications": "Notifications",
+    "sounds": "Sounds",
+    "theme": "Theme"
+  },
+  "nav": {
+    "home": "Home",
+    "leaderboard": "Leaderboard",
+    "achievements": "Achievements",
+    "focusRooms": "Focus Rooms",
+    "settings": "Settings"
+  },
+  "stats": {
+    "title": "Statistics",
+    "todayFocus": "Today's Focus",
+    "weeklyFocus": "Weekly Focus",
+    "totalSessions": "Total Sessions",
+    "currentStreak": "Current Streak",
+    "longestStreak": "Longest Streak",
+    "focusHours": "Focus Hours"
+  },
+  "goals": {
+    "title": "Daily Goal",
+    "setGoal": "Set your daily goal",
+    "targetPomodoros": "Target Pomodoros",
+    "progress": "{current} of {target} completed",
+    "goalMet": "Goal achieved! 🎉"
+  },
+  "focusRooms": {
+    "title": "Focus Rooms",
+    "createRoom": "Create Room",
+    "joinRoom": "Join Room",
+    "members": "{count} members",
+    "active": "Active",
+    "roomCode": "Room Code",
+    "copyCode": "Copy Code",
+    "leaveRoom": "Leave Room"
+  },
+  "achievements": {
+    "title": "Achievements",
+    "unlocked": "Unlocked",
+    "locked": "Locked",
+    "progress": "{current}/{total}",
+    "newAchievement": "New Achievement!"
+  },
+  "quotes": {
+    "refresh": "New Quote"
+  },
+  "language": {
+    "title": "Language",
+    "select": "Select Language"
+  }
+}

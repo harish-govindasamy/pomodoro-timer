@@ -1,0 +1,89 @@
+{
+  "common": {
+    "start": "Iniciar",
+    "pause": "Pausar",
+    "reset": "Reiniciar",
+    "save": "Guardar",
+    "cancel": "Cancelar",
+    "delete": "Eliminar",
+    "edit": "Editar",
+    "loading": "Cargando...",
+    "error": "Ocurrió un error",
+    "success": "¡Éxito!"
+  },
+  "timer": {
+    "focus": "Enfoque",
+    "shortBreak": "Descanso Corto",
+    "longBreak": "Descanso Largo",
+    "timeRemaining": "{minutes} min restantes",
+    "sessionComplete": "¡Sesión Completada!",
+    "pomodorosCompleted": "{count} pomodoros completados"
+  },
+  "tasks": {
+    "title": "Tareas",
+    "addTask": "Agregar tarea",
+    "completed": "Completadas",
+    "pending": "Pendientes",
+    "noTasks": "Sin tareas. ¡Agrega una para empezar!",
+    "deleteConfirm": "¿Estás seguro de eliminar esta tarea?",
+    "estimatedPomodoros": "{count} pomodoros estimados"
+  },
+  "settings": {
+    "title": "Configuración",
+    "focusDuration": "Duración del Enfoque",
+    "shortBreakDuration": "Duración Descanso Corto",
+    "longBreakDuration": "Duración Descanso Largo",
+    "autoStartBreaks": "Iniciar descansos automáticamente",
+    "autoStartPomodoros": "Iniciar pomodoros automáticamente",
+    "notifications": "Notificaciones",
+    "sounds": "Sonidos",
+    "theme": "Tema"
+  },
+  "nav": {
+    "home": "Inicio",
+    "leaderboard": "Clasificación",
+    "achievements": "Logros",
+    "focusRooms": "Salas de Enfoque",
+    "settings": "Configuración"
+  },
+  "stats": {
+    "title": "Estadísticas",
+    "todayFocus": "Enfoque de Hoy",
+    "weeklyFocus": "Enfoque Semanal",
+    "totalSessions": "Sesiones Totales",
+    "currentStreak": "Racha Actual",
+    "longestStreak": "Racha Más Larga",
+    "focusHours": "Horas de Enfoque"
+  },
+  "goals": {
+    "title": "Meta Diaria",
+    "setGoal": "Establece tu meta diaria",
+    "targetPomodoros": "Pomodoros Objetivo",
+    "progress": "{current} de {target} completados",
+    "goalMet": "¡Meta alcanzada! 🎉"
+  },
+  "focusRooms": {
+    "title": "Salas de Enfoque",
+    "createRoom": "Crear Sala",
+    "joinRoom": "Unirse a Sala",
+    "members": "{count} miembros",
+    "active": "Activa",
+    "roomCode": "Código de Sala",
+    "copyCode": "Copiar Código",
+    "leaveRoom": "Salir de Sala"
+  },
+  "achievements": {
+    "title": "Logros",
+    "unlocked": "Desbloqueados",
+    "locked": "Bloqueados",
+    "progress": "{current}/{total}",
+    "newAchievement": "¡Nuevo Logro!"
+  },
+  "quotes": {
+    "refresh": "Nueva Cita"
+  },
+  "language": {
+    "title": "Idioma",
+    "select": "Seleccionar Idioma"
+  }
+}

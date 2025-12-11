@@ -2,13 +2,15 @@
 // Supports all 16 planned features including social, achievements, and analytics
 
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
+  previewFeatures = ["driverAdapters"]
 }
 
 datasource db {
   provider = "sqlite"
   url      = env("DATABASE_URL")
 }
+
 
 // ============================================
 // USER & AUTHENTICATION

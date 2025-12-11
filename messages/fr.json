@@ -1,0 +1,89 @@
+{
+  "common": {
+    "start": "Démarrer",
+    "pause": "Pause",
+    "reset": "Réinitialiser",
+    "save": "Enregistrer",
+    "cancel": "Annuler",
+    "delete": "Supprimer",
+    "edit": "Modifier",
+    "loading": "Chargement...",
+    "error": "Une erreur s'est produite",
+    "success": "Succès!"
+  },
+  "timer": {
+    "focus": "Concentration",
+    "shortBreak": "Pause Courte",
+    "longBreak": "Pause Longue",
+    "timeRemaining": "{minutes} min restantes",
+    "sessionComplete": "Session Terminée!",
+    "pomodorosCompleted": "{count} pomodoros terminés"
+  },
+  "tasks": {
+    "title": "Tâches",
+    "addTask": "Ajouter une tâche",
+    "completed": "Terminées",
+    "pending": "En attente",
+    "noTasks": "Pas de tâches. Ajoutez-en une pour commencer!",
+    "deleteConfirm": "Êtes-vous sûr de vouloir supprimer cette tâche?",
+    "estimatedPomodoros": "{count} pomodoros estimés"
+  },
+  "settings": {
+    "title": "Paramètres",
+    "focusDuration": "Durée de Concentration",
+    "shortBreakDuration": "Durée Pause Courte",
+    "longBreakDuration": "Durée Pause Longue",
+    "autoStartBreaks": "Démarrer les pauses automatiquement",
+    "autoStartPomodoros": "Démarrer les pomodoros automatiquement",
+    "notifications": "Notifications",
+    "sounds": "Sons",
+    "theme": "Thème"
+  },
+  "nav": {
+    "home": "Accueil",
+    "leaderboard": "Classement",
+    "achievements": "Succès",
+    "focusRooms": "Salles de Concentration",
+    "settings": "Paramètres"
+  },
+  "stats": {
+    "title": "Statistiques",
+    "todayFocus": "Concentration du Jour",
+    "weeklyFocus": "Concentration Hebdomadaire",
+    "totalSessions": "Sessions Totales",
+    "currentStreak": "Série Actuelle",
+    "longestStreak": "Plus Longue Série",
+    "focusHours": "Heures de Concentration"
+  },
+  "goals": {
+    "title": "Objectif Quotidien",
+    "setGoal": "Définir votre objectif quotidien",
+    "targetPomodoros": "Pomodoros Cibles",
+    "progress": "{current} sur {target} terminés",
+    "goalMet": "Objectif atteint! 🎉"
+  },
+  "focusRooms": {
+    "title": "Salles de Concentration",
+    "createRoom": "Créer une Salle",
+    "joinRoom": "Rejoindre une Salle",
+    "members": "{count} membres",
+    "active": "Active",
+    "roomCode": "Code de Salle",
+    "copyCode": "Copier le Code",
+    "leaveRoom": "Quitter la Salle"
+  },
+  "achievements": {
+    "title": "Succès",
+    "unlocked": "Débloqués",
+    "locked": "Verrouillés",
+    "progress": "{current}/{total}",
+    "newAchievement": "Nouveau Succès!"
+  },
+  "quotes": {
+    "refresh": "Nouvelle Citation"
+  },
+  "language": {
+    "title": "Langue",
+    "select": "Sélectionner la Langue"
+  }
+}

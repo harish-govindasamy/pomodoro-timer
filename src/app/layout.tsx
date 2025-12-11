@@ -6,6 +6,8 @@ import { ThemeProvider } from "@/components/theme-provider";
 import { Analytics } from "@/components/Analytics";
 import { Providers } from "@/providers";
 import { GlobalAchievementNotification } from "@/components/achievements/GlobalAchievementNotification";
+import { NextIntlClientProvider } from "next-intl";
+import { getMessages, getLocale } from "next-intl/server";
 
 // JSON-LD Structured Data for SEO
 const jsonLd = {
@@ -151,13 +153,16 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const locale = await getLocale();
+  const messages = await getMessages();
+
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang={locale} suppressHydrationWarning>
       <head>
         <script
           type="application/ld+json"
@@ -174,17 +179,19 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased bg-background text-foreground`}
       >
         <Providers>
-          <ThemeProvider
-            attribute="class"
-            defaultTheme="light"
-            enableSystem
-            disableTransitionOnChange
-          >
-            {children}
-            <Toaster />
-            <Analytics />
-            <GlobalAchievementNotification />
-          </ThemeProvider>
+          <NextIntlClientProvider messages={messages}>
+            <ThemeProvider
+              attribute="class"
+              defaultTheme="light"
+              enableSystem
+              disableTransitionOnChange
+            >
+              {children}
+              <Toaster />
+              <Analytics />
+              <GlobalAchievementNotification />
+            </ThemeProvider>
+          </NextIntlClientProvider>
         </Providers>
       </body>
     </html>

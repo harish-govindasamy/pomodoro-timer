@@ -1,0 +1,89 @@
+{
+  "common": {
+    "start": "開始",
+    "pause": "一時停止",
+    "reset": "リセット",
+    "save": "保存",
+    "cancel": "キャンセル",
+    "delete": "削除",
+    "edit": "編集",
+    "loading": "読み込み中...",
+    "error": "エラーが発生しました",
+    "success": "成功!"
+  },
+  "timer": {
+    "focus": "集中",
+    "shortBreak": "短い休憩",
+    "longBreak": "長い休憩",
+    "timeRemaining": "残り{minutes}分",
+    "sessionComplete": "セッション完了!",
+    "pomodorosCompleted": "{count}ポモドーロ完了"
+  },
+  "tasks": {
+    "title": "タスク",
+    "addTask": "タスクを追加",
+    "completed": "完了",
+    "pending": "未完了",
+    "noTasks": "タスクがありません。追加して始めましょう!",
+    "deleteConfirm": "このタスクを削除しますか?",
+    "estimatedPomodoros": "推定{count}ポモドーロ"
+  },
+  "settings": {
+    "title": "設定",
+    "focusDuration": "集中時間",
+    "shortBreakDuration": "短い休憩時間",
+    "longBreakDuration": "長い休憩時間",
+    "autoStartBreaks": "休憩を自動開始",
+    "autoStartPomodoros": "ポモドーロを自動開始",
+    "notifications": "通知",
+    "sounds": "サウンド",
+    "theme": "テーマ"
+  },
+  "nav": {
+    "home": "ホーム",
+    "leaderboard": "リーダーボード",
+    "achievements": "実績",
+    "focusRooms": "集中ルーム",
+    "settings": "設定"
+  },
+  "stats": {
+    "title": "統計",
+    "todayFocus": "今日の集中時間",
+    "weeklyFocus": "週間集中時間",
+    "totalSessions": "合計セッション",
+    "currentStreak": "現在の連続日数",
+    "longestStreak": "最長連続日数",
+    "focusHours": "集中時間"
+  },
+  "goals": {
+    "title": "日課目標",
+    "setGoal": "日課目標を設定",
+    "targetPomodoros": "目標ポモドーロ",
+    "progress": "{target}中{current}完了",
+    "goalMet": "目標達成! 🎉"
+  },
+  "focusRooms": {
+    "title": "集中ルーム",
+    "createRoom": "ルームを作成",
+    "joinRoom": "ルームに参加",
+    "members": "{count}人のメンバー",
+    "active": "アクティブ",
+    "roomCode": "ルームコード",
+    "copyCode": "コードをコピー",
+    "leaveRoom": "ルームを退出"
+  },
+  "achievements": {
+    "title": "実績",
+    "unlocked": "解除済み",
+    "locked": "ロック中",
+    "progress": "{current}/{total}",
+    "newAchievement": "新しい実績!"
+  },
+  "quotes": {
+    "refresh": "新しい名言"
+  },
+  "language": {
+    "title": "言語",
+    "select": "言語を選択"
+  }
+}

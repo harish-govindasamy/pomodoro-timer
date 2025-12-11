@@ -1,0 +1,89 @@
+{
+  "common": {
+    "start": "Starten",
+    "pause": "Pause",
+    "reset": "Zurücksetzen",
+    "save": "Speichern",
+    "cancel": "Abbrechen",
+    "delete": "Löschen",
+    "edit": "Bearbeiten",
+    "loading": "Laden...",
+    "error": "Ein Fehler ist aufgetreten",
+    "success": "Erfolg!"
+  },
+  "timer": {
+    "focus": "Fokus",
+    "shortBreak": "Kurze Pause",
+    "longBreak": "Lange Pause",
+    "timeRemaining": "{minutes} Min verbleibend",
+    "sessionComplete": "Sitzung Abgeschlossen!",
+    "pomodorosCompleted": "{count} Pomodoros abgeschlossen"
+  },
+  "tasks": {
+    "title": "Aufgaben",
+    "addTask": "Aufgabe hinzufügen",
+    "completed": "Abgeschlossen",
+    "pending": "Ausstehend",
+    "noTasks": "Noch keine Aufgaben. Fügen Sie eine hinzu!",
+    "deleteConfirm": "Sind Sie sicher, diese Aufgabe zu löschen?",
+    "estimatedPomodoros": "{count} geschätzte Pomodoros"
+  },
+  "settings": {
+    "title": "Einstellungen",
+    "focusDuration": "Fokus-Dauer",
+    "shortBreakDuration": "Kurze Pause Dauer",
+    "longBreakDuration": "Lange Pause Dauer",
+    "autoStartBreaks": "Pausen automatisch starten",
+    "autoStartPomodoros": "Pomodoros automatisch starten",
+    "notifications": "Benachrichtigungen",
+    "sounds": "Töne",
+    "theme": "Design"
+  },
+  "nav": {
+    "home": "Startseite",
+    "leaderboard": "Bestenliste",
+    "achievements": "Erfolge",
+    "focusRooms": "Fokus-Räume",
+    "settings": "Einstellungen"
+  },
+  "stats": {
+    "title": "Statistiken",
+    "todayFocus": "Heutiger Fokus",
+    "weeklyFocus": "Wöchentlicher Fokus",
+    "totalSessions": "Gesamt Sitzungen",
+    "currentStreak": "Aktuelle Serie",
+    "longestStreak": "Längste Serie",
+    "focusHours": "Fokus-Stunden"
+  },
+  "goals": {
+    "title": "Tagesziel",
+    "setGoal": "Tagesziel festlegen",
+    "targetPomodoros": "Ziel-Pomodoros",
+    "progress": "{current} von {target} abgeschlossen",
+    "goalMet": "Ziel erreicht! 🎉"
+  },
+  "focusRooms": {
+    "title": "Fokus-Räume",
+    "createRoom": "Raum Erstellen",
+    "joinRoom": "Raum Beitreten",
+    "members": "{count} Mitglieder",
+    "active": "Aktiv",
+    "roomCode": "Raum-Code",
+    "copyCode": "Code Kopieren",
+    "leaveRoom": "Raum Verlassen"
+  },
+  "achievements": {
+    "title": "Erfolge",
+    "unlocked": "Freigeschaltet",
+    "locked": "Gesperrt",
+    "progress": "{current}/{total}",
+    "newAchievement": "Neuer Erfolg!"
+  },
+  "quotes": {
+    "refresh": "Neues Zitat"
+  },
+  "language": {
+    "title": "Sprache",
+    "select": "Sprache Auswählen"
+  }
+}

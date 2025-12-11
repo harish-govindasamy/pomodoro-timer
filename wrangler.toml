@@ -1,0 +1,29 @@
+# yaml-language-server: $schema=node_modules/wrangler/config-schema.json
+name = "pomofocus"
+compatibility_date = "2024-09-23"
+compatibility_flags = ["nodejs_compat"]
+
+# Main entry point for OpenNext
+main = ".open-next/worker.js"
+minify = true
+
+# Assets directory for static files
+[assets]
+directory = ".open-next/assets"
+binding = "ASSETS"
+
+# D1 Database binding
+[[d1_databases]]
+binding = "pomofocus_db"
+database_name = "pomofocus-db"
+database_id = "3ab68b81-4fe2-4c30-b3dd-7c4cd71e2404"
+
+# Environment variables (set in Cloudflare dashboard for production)
+[vars]
+NEXTAUTH_URL = "https://pomofocus.pages.dev"
+
+# Durable Objects for real-time Focus Room sync (future)
+# [durable_objects]
+# bindings = [
+#   { name = "FOCUS_ROOM", class_name = "FocusRoomDO" }
+# ]
