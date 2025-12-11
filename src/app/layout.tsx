@@ -5,6 +5,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Analytics } from "@/components/Analytics";
 import { Providers } from "@/providers";
+import { GlobalAchievementNotification } from "@/components/achievements/GlobalAchievementNotification";
 
 // JSON-LD Structured Data for SEO
 const jsonLd = {
@@ -182,6 +183,7 @@ export default function RootLayout({
             {children}
             <Toaster />
             <Analytics />
+            <GlobalAchievementNotification />
           </ThemeProvider>
         </Providers>
       </body>

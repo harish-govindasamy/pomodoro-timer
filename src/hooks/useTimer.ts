@@ -4,6 +4,10 @@ import { useTaskStore } from "@/store/taskStore";
 import { useStatsStore } from "@/store/statsStore";
 import { useSettingsStore } from "@/store/settingsStore";
 import {
+  useAchievementStore,
+  checkAchievements,
+} from "@/store/achievementStore";
+import {
   formatTime,
   playSound,
   showNotification,
@@ -35,6 +39,7 @@ export function useTimer() {
   const { incrementTaskPomodoro, getSelectedTask } = useTaskStore();
   const { incrementPomodoro, updateFocusTime } = useStatsStore();
   const { settings } = useSettingsStore();
+  const { addPendingAchievements } = useAchievementStore();
 
   // Request notification permission on mount
   useEffect(() => {
@@ -73,6 +78,13 @@ export function useTimer() {
       if (selectedTaskId) {
         incrementTaskPomodoro(selectedTaskId);
       }
+
+      // Check for newly unlocked achievements
+      checkAchievements("session_complete").then((newAchievements) => {
+        if (newAchievements.length > 0) {
+          addPendingAchievements(newAchievements);
+        }
+      });
     }
 
     // Auto-start next session if enabled
@@ -93,6 +105,7 @@ export function useTimer() {
     startTimer,
     settings.autoStartNextSession,
     settings.focusTime,
+    addPendingAchievements,
   ]);
 
   // Track if completion has been handled to prevent multiple calls

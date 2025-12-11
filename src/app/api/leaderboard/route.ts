@@ -3,6 +3,9 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
+// Type assertion for Prisma client with all models
+const db = prisma as any;
+
 // GET /api/leaderboard - Get leaderboard data
 export async function GET(request: NextRequest) {
   try {
@@ -58,14 +61,77 @@ export async function GET(request: NextRequest) {
         );
     }
 
-    // Get aggregated stats for all users who have opted into the leaderboard
-    const userStats = await prisma.user.findMany({
+    // Get all users with their pomodoro stats
+    const users = await db.user.findMany({
       select: {
         id: true,
         name: true,
-        email: true,
+        username: true,
+        image: true,
       },
     });
+
+    // Get pomodoro session stats for all users
+    const sessionStats = await db.pomodoroSession.groupBy({
+      by: ["userId"],
+      where: {
+        mode: "focus",
+        status: "completed",
+        ...(startDate && { startedAt: { gte: startDate } }),
+      },
+      _count: {
+        id: true,
+      },
+      _sum: {
+        actualDuration: true,
+      },
+    });
+
+    // Get completed tasks count for all users
+    const taskStats = await db.task.groupBy({
+      by: ["userId"],
+      where: {
+        isCompleted: true,
+        ...(startDate && { completedAt: { gte: startDate } }),
+      },
+      _count: {
+        id: true,
+      },
+    });
+
+    // Get streak data for all users
+    const streaks = await db.streak.findMany({
+      select: {
+        userId: true,
+        currentStreak: true,
+        longestStreak: true,
+      },
+    });
+
+    // Create lookup maps for efficient access
+    const sessionStatsMap = new Map<
+      string,
+      { pomodorosCompleted: number; totalFocusSeconds: number }
+    >(
+      sessionStats.map((s: any) => [
+        s.userId,
+        {
+          pomodorosCompleted: s._count.id,
+          totalFocusSeconds: s._sum.actualDuration || 0,
+        },
+      ]),
+    );
+
+    const taskStatsMap = new Map<string, number>(
+      taskStats.map((t: any) => [t.userId, t._count.id]),
+    );
+
+    const streakMap = new Map<string, { current: number; longest: number }>(
+      streaks.map((s: any) => [
+        s.userId,
+        { current: s.currentStreak, longest: s.longestStreak },
+      ]),
+    );
 
     // Calculate stats for each user
     interface ComputedUserStats {
@@ -79,15 +145,27 @@ export async function GET(request: NextRequest) {
       points: number;
     }
 
-    const computedStats: ComputedUserStats[] = userStats
-      .map((user) => {
-        // Since the schema doesn't have these relations, we'll return basic data
-        const pomodorosCompleted = 0;
-        const totalFocusMinutes = 0;
-        const tasksCompleted = 0;
-        const streakDays = 0;
+    const computedStats: ComputedUserStats[] = users
+      .map((user: any) => {
+        const sessionData = sessionStatsMap.get(user.id) || {
+          pomodorosCompleted: 0,
+          totalFocusSeconds: 0,
+        };
+        const tasksCompleted = taskStatsMap.get(user.id) || 0;
+        const streakData = streakMap.get(user.id) || { current: 0, longest: 0 };
+
+        const pomodorosCompleted = sessionData.pomodorosCompleted;
+        const totalFocusMinutes = Math.floor(
+          sessionData.totalFocusSeconds / 60,
+        );
+        const streakDays =
+          type === "allTime" ? streakData.longest : streakData.current;
 
         // Calculate points: weighted score
+        // Pomodoros: 10 points each
+        // Focus time: 5 points per 10 minutes
+        // Tasks: 15 points each
+        // Streak: 20 points per day
         const points =
           pomodorosCompleted * 10 +
           Math.floor(totalFocusMinutes / 10) * 5 +
@@ -96,8 +174,8 @@ export async function GET(request: NextRequest) {
 
         return {
           userId: user.id,
-          userName: user.name || "Anonymous",
-          userImage: null,
+          userName: user.name || user.username || "Anonymous",
+          userImage: user.image,
           pomodorosCompleted,
           totalFocusMinutes,
           tasksCompleted,
@@ -105,8 +183,10 @@ export async function GET(request: NextRequest) {
           points,
         };
       })
-      .filter((stats) => stats.points > 0)
-      .sort((a, b) => b.points - a.points);
+      .filter((stats: ComputedUserStats) => stats.points > 0)
+      .sort(
+        (a: ComputedUserStats, b: ComputedUserStats) => b.points - a.points,
+      );
 
     // Assign ranks
     const rankedStats = computedStats.map((stats, index) => ({
