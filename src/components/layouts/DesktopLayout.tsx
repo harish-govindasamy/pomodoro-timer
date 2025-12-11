@@ -12,6 +12,7 @@ import {
   LazyEnhancedStats,
 } from "@/components/LazyComponents";
 import { DailyGoalCard } from "@/components/goals/DailyGoalCard";
+import { AnimatedBackground } from "@/components/ui/animated-background";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
@@ -357,15 +358,18 @@ export function DesktopLayout() {
         </div>
       </header>
 
+      {/* Animated Background */}
+      <AnimatedBackground />
+
       {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-6 py-4 flex-1">
+      <main className="relative max-w-7xl mx-auto px-6 py-4 flex-1">
         <div className="grid grid-cols-12 gap-6">
           {/* Left Panel - Timer */}
           <div className="col-span-12 lg:col-span-5 xl:col-span-4">
             <div className="sticky top-20 space-y-4">
-              <Card className="p-5 border-border/40">
+              <div className="glass-card p-5">
                 <EnhancedTimerDisplay size="large" showTaskCard={true} />
-              </Card>
+              </div>
 
               {/* Daily Goal Card */}
               <DailyGoalCard variant="default" showEditButton={true} />
@@ -403,21 +407,21 @@ export function DesktopLayout() {
               </TabsList>
 
               <TabsContent value="tasks" className="mt-0">
-                <Card className="p-5 border-border/40">
+                <div className="glass-card p-5">
                   <LazyDesktopTaskList />
-                </Card>
+                </div>
               </TabsContent>
 
               <TabsContent value="stats" className="mt-0">
-                <Card className="p-5 border-border/40">
+                <div className="glass-card p-5">
                   <LazyEnhancedStats />
-                </Card>
+                </div>
               </TabsContent>
 
               <TabsContent value="settings" className="mt-0">
-                <Card className="p-5 border-border/40">
+                <div className="glass-card p-5">
                   <SettingsPanel />
-                </Card>
+                </div>
               </TabsContent>
             </Tabs>
           </div>
