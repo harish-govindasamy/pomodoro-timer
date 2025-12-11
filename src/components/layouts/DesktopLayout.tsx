@@ -11,6 +11,7 @@ import {
   LazyDesktopTaskList,
   LazyEnhancedStats,
 } from "@/components/LazyComponents";
+import { DailyGoalCard } from "@/components/goals/DailyGoalCard";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
@@ -361,9 +362,14 @@ export function DesktopLayout() {
         <div className="grid grid-cols-12 gap-6">
           {/* Left Panel - Timer */}
           <div className="col-span-12 lg:col-span-5 xl:col-span-4">
-            <Card className="p-5 sticky top-20 border-border/40">
-              <EnhancedTimerDisplay size="large" showTaskCard={true} />
-            </Card>
+            <div className="sticky top-20 space-y-4">
+              <Card className="p-5 border-border/40">
+                <EnhancedTimerDisplay size="large" showTaskCard={true} />
+              </Card>
+
+              {/* Daily Goal Card */}
+              <DailyGoalCard variant="default" showEditButton={true} />
+            </div>
           </div>
 
           {/* Right Panel - Tabs */}

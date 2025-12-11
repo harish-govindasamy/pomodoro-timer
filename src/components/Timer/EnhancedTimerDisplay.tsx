@@ -14,6 +14,7 @@ import {
   Moon,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { QuoteDisplay } from "@/components/quotes/QuoteDisplay";
 
 interface CircularProgressProps {
   progress: number;
@@ -537,6 +538,17 @@ export function EnhancedTimerDisplay({
           </div>
         ))}
       </div>
+
+      {/* Motivational Quote - Show during breaks */}
+      {(mode === "shortBreak" || mode === "longBreak") && (
+        <div className="w-full max-w-sm mt-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+          <QuoteDisplay
+            category="break"
+            variant="compact"
+            showRefreshButton={true}
+          />
+        </div>
+      )}
     </div>
   );
 }
